@@ -1,6 +1,7 @@
 /*
  * This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. 
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
+ * Based off of Julian Garnier's original project, juliangarnier.com
  * Copyright (c) 2016 Julian Garnier
  */
 
@@ -16,19 +17,19 @@ window.onload = function() {
     var hours =  date.getHours();
     var minutes =  date.getMinutes();
     var current = hours + (minutes * .01);
-    if (current >= 5 && current < 19) return 'Have a nice day';
-    if (current >= 19 && current < 22) return 'Have a nice evening';
-    if (current >= 22 || current < 5) return 'Have a good night';
+    if (current >= 5 && current < 19) return 'Feel free to contact me. Have<br>a nice day';
+    if (current >= 19 && current < 22) return 'I\'m video gaming right now so<br>I\'ll ttyl. Have a good evening';
+    if (current >= 22 || current < 5) return 'I need to get some sleep now<br>so I\'ll ttyl. Have a good night';
   }
 
   var messages = [
-    'Hey there 👋',
-    'I\'m Julian',
-    'I design and code things on the web',
-    'I\'m currently accepting freelance work.<br> You can contact me at <a href="mailto:hello@julian.gr">hello@julian.gr</a>',
-    '<a target="_blank" href="https://twitter.com/juliangarnier">twitter.com/juliangarnier</a><br><a target="_blank" href="https://codepen.io/juliangarnier">codepen.io/juliangarnier</a><br><a target="_blank" href="https://github.com/juliangarnier">github.com/juliangarnier</a>',
+    'Hey, I\'m Chris',
+    'I design things and code them<br>onto the web',
+    'I\'m currently doing UX work at<br>Code Publishing Co. You can<br>check out some of my work at<br><a target="_blank" href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a>',
+    'Want to get in touch?',
+    'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a><br>or message me on LinkedIn:<br><a target="_blank" href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a>',
     getCurrentTime(),
-    '👀 J.'
+    '👋'
   ]
 
   var getFontSize = function() {
