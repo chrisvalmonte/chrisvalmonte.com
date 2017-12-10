@@ -24,17 +24,17 @@ var Messages = (function () {
     var hours =  date.getHours();
     var minutes =  date.getMinutes();
     var current = hours + (minutes * .01);
-    if (current >= 5 && current < 19) return 'Feel free to contact me. Have<br>a nice day';
-    if (current >= 19 && current < 22) return 'I\'m video gaming right now so<br>I\'ll ttyl. Have a good evening';
-    if (current >= 22 || current < 5) return 'I need to get some sleep now<br>so I\'ll ttyl. Have a good night';
+    if (current >= 5 && current < 19) return 'Have a nice day';
+    if (current >= 19 && current < 22) return 'Have a good evening';
+    if (current >= 22 || current < 5) return 'Have a good night';
   }
 
   var _messages = [
     'Hey, I\'m Chris',
-    'I design things and code them<br>onto the web',
-    'I\'m currently doing UX work at<br>Code Publishing Co. You can<br>check out some of my work at<br><a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a>',
-    'Want to get in touch?',
-    'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a><br>or message me on LinkedIn:<br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a>',
+    'I\'m currently designing and<br>developing user interfaces',
+    'You can view my portfolio at<br><a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a>',
+    'Let me know what you think.<br>Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
+    'I look forward to your reply',
     _getCurrentTime(),
     '👋'
   ]
