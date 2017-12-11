@@ -24,19 +24,19 @@ var Messages = (function () {
     var hours =  date.getHours();
     var minutes =  date.getMinutes();
     var current = hours + (minutes * .01);
-    if (current >= 5 && current < 19) return 'Have a nice day';
-    if (current >= 19 && current < 22) return 'Have a good evening';
-    if (current >= 22 || current < 5) return 'Have a good night';
+    if (current >= 5 && current < 19) return 'Ttyl. Have a nice day';
+    if (current >= 19 && current < 22) return 'Ttyl. Have a good evening';
+    if (current >= 22 || current < 5) return 'Ttyl. Have a good night';
   }
 
   var _messages = [
-    'Hey, I\'m Chris',
-    'I\'m currently designing and<br>developing user interfaces',
-    'You can view my portfolio at<br><a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a>',
-    'Let me know what you think.<br>Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
-    'I look forward to your reply',
+    'Hi, I\'m Chris',
+    'I design and code things',
+    'Check out some of my work at<br><a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a>',
+    'Let me know what you think',
+    '<a href="mailto:reply@chrisvalmonte.com">reply@chrisvalmonte.com</a> or<br>connect with me on LinkedIn:<br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a>',
     _getCurrentTime(),
-    '👋'
+    '👋',
   ]
 
   var _getFontSize = function() {
