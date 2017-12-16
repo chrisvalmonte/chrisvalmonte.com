@@ -12,7 +12,7 @@ window.onload = function() {
 }
 
 
-var Messages = (function () {
+var Messages = (function() {
 
   var _messagesEl = document.querySelector('.messages');
   var _typingSpeed = 20;
@@ -23,19 +23,22 @@ var Messages = (function () {
     var date = new Date();
     var hours =  date.getHours();
     var minutes =  date.getMinutes();
-    var current = hours + (minutes * .01);
-    if (current >= 5 && current < 19) return 'Ttyl. Have a nice day';
-    if (current >= 19 && current < 22) return 'Ttyl. Have a good evening';
-    if (current >= 22 || current < 5) return 'Ttyl. Have a good night';
+    return hours + (minutes * .01);
+  }
+
+  var _getCurrentTimeMessage = function() {
+    if (_getCurrentTime() >= 5 && _getCurrentTime() < 17) return 'Have a nice day';
+    if (_getCurrentTime() >= 17 && _getCurrentTime() < 22) return 'Have a good evening';
+    if (_getCurrentTime() >= 22 || _getCurrentTime() < 5) return 'Have a good night';
   }
 
   var _messages = [
     'Hi, I\'m Chris',
-    'I design and code things',
-    'Check out some of my work at<br><a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a>',
-    'Let me know what you think',
-    '<a href="mailto:reply@chrisvalmonte.com">reply@chrisvalmonte.com</a> or<br>connect with me on LinkedIn:<br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a>',
-    _getCurrentTime(),
+    'Designer and coder by day,<br>serious video gamer by night',
+    'I\'m currently improving web UX<br>for U.S. governments and their<br>surrounding communities',
+    'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
+    '<a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig">instagram.com/chrisvalmonte.ig</a>',
+    _getCurrentTimeMessage(),
     '👋',
   ]
 
