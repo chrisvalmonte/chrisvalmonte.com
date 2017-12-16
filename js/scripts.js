@@ -28,8 +28,8 @@ var Messages = (function() {
 
   var _getCurrentTimeMessage = function() {
     if (_getCurrentTime() >= 5 && _getCurrentTime() < 17) return 'Have a nice day';
-    if (_getCurrentTime() >= 17 && _getCurrentTime() < 22) return 'Have a good evening';
-    if (_getCurrentTime() >= 22 || _getCurrentTime() < 5) return 'Have a good night';
+    if (_getCurrentTime() >= 17 && _getCurrentTime() < 19) return 'Have a good evening';
+    if (_getCurrentTime() >= 19 || _getCurrentTime() < 5) return 'Have a good night';
   }
 
   var _messages = [
