@@ -34,8 +34,9 @@ var Messages = (function() {
 
   var _messages = [
     'Hi, I\'m Chris',
-    'Designer and coder by day,<br>serious video gamer by night',
-    'I\'m currently improving web UX<br>for U.S. governments and their<br>surrounding communities',
+    'I design and code things',
+    'I\'m currently developing user<br>interfaces for local governments',
+    'I enjoy traveling, playing video<br>games, and being a 12th man<br>for the Seattle Seahawks',
     'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
     '<a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig">instagram.com/chrisvalmonte.ig</a>',
     _getCurrentTimeMessage(),
