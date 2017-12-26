@@ -27,20 +27,19 @@ var Messages = (function() {
   }
 
   var _getCurrentTimeMessage = function() {
-    if (_getCurrentTime() >= 5 && _getCurrentTime() < 17) return 'Have a nice day';
-    if (_getCurrentTime() >= 17 && _getCurrentTime() < 19) return 'Have a good evening';
-    if (_getCurrentTime() >= 19 || _getCurrentTime() < 5) return 'Have a good night';
+    if (_getCurrentTime() >= 5 && _getCurrentTime() < 17) return 'Have a nice day 👋';
+    if (_getCurrentTime() >= 17 && _getCurrentTime() < 19) return 'Have a good evening 👋';
+    if (_getCurrentTime() >= 19 || _getCurrentTime() < 5) return 'Have a good night 👋';
   }
 
   var _messages = [
     'Hi, I\'m Chris',
     'I design and code things',
-    'I\'m currently developing user<br>interfaces for local governments',
+    'I\'m currently developing user<br>interfaces for U.S. governments',
     'I enjoy traveling, playing video<br>games, and being a 12th man<br>for the Seattle Seahawks',
     'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
     '<a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig">instagram.com/chrisvalmonte.ig</a>',
     _getCurrentTimeMessage(),
-    '👋',
   ]
 
   var _getFontSize = function() {
