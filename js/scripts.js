@@ -38,8 +38,8 @@ var Messages = (function() {
     'I design and code things',
     'I\'m currently developing user<br>interfaces for U.S. governments',
     'I enjoy traveling, playing video<br>games, and being a 12th man<br>for the Seattle Seahawks',
-    'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
-    '<a href="https://behance.net/chrisvalmonte">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig">instagram.com/chrisvalmonte.ig</a>',
+    'Say <a href="mailto:hello@chrisvalmonte.com" target="_blank">hello@chrisvalmonte.com</a>',
+    '<a href="https://behance.net/chrisvalmonte" target="_blank">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte" target="_blank">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig" target="_blank">instagram.com/chrisvalmonte.ig</a>',
     _getCurrentTimeMessage(),
   ]
 
