@@ -76,7 +76,7 @@ body {
 }
 .fab {
   bottom: 30px;
-  position: absolute;
+  position: fixed;
   right: 25px;
 }
 .fab > a {
