@@ -87,17 +87,17 @@ body {
   color: #fff;
   display: flex;
   flex-direction: column;
-  height: 0;
+  height: 3.5rem;
   justify-content: center;
   text-decoration: none;
-  width: 0;
+  transform: scale(0);
+  width: 3.5rem;
 }
 .fab > a.open {
-  height: 3.5rem;
+  transform: scale(1);
   transition-duration: 500ms;
-  transition-property: height, width;
+  transition-property: transform;
   transition-timing-function: ease-out;
-  width: 3.5rem;
 }
 .fab > a > i {
   font-size: 1.5rem;
