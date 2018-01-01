@@ -74,3 +74,31 @@ body {
   display: inline-block;
   color: rgba(0,0,0,.5);
 }
+.fab {
+  bottom: 30px;
+  position: absolute;
+  right: 25px;
+}
+.fab > a {
+  align-items: center;
+  background: #008000;
+  border-radius: 50%;
+  box-shadow: 0 1px 7px 0 rgba(0, 0, 0, .5);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 0;
+  justify-content: center;
+  text-decoration: none;
+  width: 0;
+}
+.fab > a.open {
+  height: 3.5rem;
+  transition-duration: 500ms;
+  transition-property: height, width;
+  transition-timing-function: ease-out;
+  width: 3.5rem;
+}
+.fab > a > i {
+  font-size: 1.5rem;
+}

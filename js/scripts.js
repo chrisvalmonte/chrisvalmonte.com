@@ -9,6 +9,9 @@
  */
 
 window.onload = function() {
+  var fab = document.querySelector('.fab > a');
+  fab.className += 'open';
+
   Messages.send();
 }
 
