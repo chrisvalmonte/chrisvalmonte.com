@@ -1,10 +1,10 @@
 /*
- * This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. 
+ * This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
- * 
+ *
  * Based off of Julian Garnier's original project, juliangarnier.com. The code from the original
  * project has been modified here by Chris Valmonte.
- * 
+ *
  * Copyright (c) 2016 Julian Garnier
  */
 
@@ -12,7 +12,12 @@ window.onload = function() {
   var fab = document.querySelector('.fab > a');
   fab.className += 'open';
 
-  Messages.send();
+  if (Messages.sent())
+    Messages.displaySent();
+  else {
+    Messages.setCookie();
+    Messages.send();
+  }
 }
 
 
@@ -176,7 +181,56 @@ var Messages = (function() {
     }, loadingDuration - 50);
   }
 
+  var _getMessageCookie = function(name) {
+    var nameField = name + '=';
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var fields = decodedCookie.split(';');
 
+    for (var i = 0; i < fields.length; i++) {
+      var current = fields[i];
+      while (current.charAt(0) === '')
+        current = current.substring(1);
+      if (current.indexOf(nameField) === 0)
+        return current.substring(nameField.length, current.length);
+    }
+
+    return '';
+  }
+
+
+
+  var COOKIE_KEY = 'chrissaid';
+  var COOKIE_VALUE = 'hello';
+
+  var checkMessageCookie = function() {
+    if (_getMessageCookie(COOKIE_KEY) !== COOKIE_VALUE)
+      return false;
+
+    return true;
+  }
+
+  var setMessageCookie = function() {
+    var date = new Date();
+    var expires = 'expires=' + date.toUTCString();
+
+    date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // Expires in 1 day
+    document.cookie = COOKIE_KEY + '=' + COOKIE_VALUE + ';' + expires + ';';
+  }
+
+  var displaySentMessages = function() {
+    // FIXME: Store current message when user initially opens webpage
+    var msgContainer = document.getElementsByClassName('messages')[0];
+
+    for (var i = 0; i < _messages.length; i++) {
+      var message = document.createElement('div');
+      (i === _messages.length - 1)
+        ? message.className += 'bubble left cornered'
+        : message.className += 'bubble left';
+      message.innerHTML = _messages[i];
+      msgContainer.appendChild(message);
+      msgContainer.appendChild(document.createElement('br'));
+    }
+  }
 
   var sendMessages = function() {
     var message = _messages[_messageIndex];
@@ -189,6 +243,9 @@ var Messages = (function() {
 
 
   return {
+    sent: checkMessageCookie,
+    displaySent: displaySentMessages,
+    setCookie: setMessageCookie,
     send: sendMessages,
   };
 
