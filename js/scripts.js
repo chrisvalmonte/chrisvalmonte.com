@@ -1,10 +1,10 @@
 /*
- * This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. 
+ * This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
- * 
+ *
  * Based off of Julian Garnier's original project, juliangarnier.com. The code from the original
  * project has been modified here by Chris Valmonte.
- * 
+ *
  * Copyright (c) 2016 Julian Garnier
  */
 
@@ -12,7 +12,12 @@ window.onload = function() {
   var fab = document.querySelector('.fab > a');
   fab.className += 'open';
 
-  Messages.send();
+  if (Messages.sent())
+    Messages.displaySent();
+  else {
+    Messages.send();
+    Messages.setCookie();
+  }
 }
 
 
@@ -178,6 +183,34 @@ var Messages = (function() {
 
 
 
+  var COOKIE_KEY = 'chrissaid';
+  var COOKIE_VALUE = _getCurrentTimeMessage();
+
+  var checkMessageCookie = function() {
+    if (!Cookies.get(COOKIE_KEY))
+      return false;
+
+    return true;
+  }
+
+  var setMessageCookie = function() {
+    Cookies.set(COOKIE_KEY, COOKIE_VALUE, { expires: 1 });
+  }
+
+  var displaySentMessages = function() {
+    var msgContainer = document.getElementsByClassName('messages')[0];
+
+    for (var i = 0; i < _messages.length; i++) {
+      var message = document.createElement('div');
+      (i === _messages.length - 1)
+        ? message.className += 'bubble left cornered'
+        : message.className += 'bubble left';
+      message.innerHTML = _messages[i];
+      msgContainer.appendChild(message);
+      msgContainer.appendChild(document.createElement('br'));
+    }
+  }
+
   var sendMessages = function() {
     var message = _messages[_messageIndex];
     if (!message) return;
@@ -189,6 +222,9 @@ var Messages = (function() {
 
 
   return {
+    sent: checkMessageCookie,
+    displaySent: displaySentMessages,
+    setCookie: setMessageCookie,
     send: sendMessages,
   };
 
