@@ -38,7 +38,8 @@ var Messages = (function() {
 
   var _messages = [
     'Hi, I\'m Chris',
-    'I design and develop user<br>interfaces for municipalities',
+    'I design and code things',
+    'I\'m looking for UI/UX design<br>opportunities in Seattle, WA',
     'Want to connect?',
     'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
     '<a href="https://behance.net/chrisvalmonte" target="_blank">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte" target="_blank">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig" target="_blank">instagram.com/chrisvalmonte.ig</a>',
