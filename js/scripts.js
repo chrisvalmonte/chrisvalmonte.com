@@ -15,8 +15,8 @@ window.onload = function() {
   if (Messages.sent())
     Messages.displaySent();
   else {
-    Messages.send();
     Messages.setCookie();
+    Messages.send();
   }
 }
 
