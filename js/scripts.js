@@ -200,15 +200,20 @@ var Messages = (function() {
   var displaySentMessages = function() {
     var msgContainer = document.getElementsByClassName('messages')[0];
 
-    for (var i = 0; i < _messages.length; i++) {
+    for (var i = 0; i < _messages.length - 1; i++) {
       var message = document.createElement('div');
-      (i === _messages.length - 1)
-        ? message.className += 'bubble left cornered'
-        : message.className += 'bubble left';
+      message.className += 'bubble left';
       message.innerHTML = _messages[i];
       msgContainer.appendChild(message);
       msgContainer.appendChild(document.createElement('br'));
     }
+
+    // Current Time Message
+    var current = document.createElement('div');
+    current.className += 'bubble left cornered';
+    current.innerHTML = Cookies.get(COOKIE_KEY);
+    msgContainer.appendChild(current);
+    msgContainer.appendChild(document.createElement('br'));
   }
 
   var sendMessages = function() {
