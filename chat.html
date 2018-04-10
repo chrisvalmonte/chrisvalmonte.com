@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<!--
+This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
+
+Based off of Julian Garnier's original project, juliangarnier.com. The code from the original
+project has been modified here by Chris Valmonte.
+
+Copyright (c) 2016 Julian Garnier
+-->
+
+<head>
+	<title>Chris Valmonte - Chat</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="description" content="I design and code things on the web." />
+	<meta property="og:site_name" content="chrisvalmonte.com" />
+	<meta property="og:title" content="Chris Valmonte" />
+	<meta property="og:description" content="I design and code things on the web." />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="http://chrisvalmonte.com/chat.html" />
+	<meta property="og:image" content="http://chrisvalmonte.com/img/og-image.png" />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:width" content="768" />
+	<meta property="og:image:height" content="416" />
+
+	<link rel="icon" type="image/png" href="img/favicon.png" />
+	<link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+	<link rel="stylesheet" type="text/css" media="screen" href="css/chat.css" />
+	<link href="https://use.fontawesome.com/releases/v5.0.2/css/all.css" rel="stylesheet">
+</head>
+<body>
+	<div class="messages"></div>
+
+	<div id="reply-fab">
+		<a href="mailto:hello@chrisvalmonte.com" aria-label="Email Chris Valmonte">
+			<i class="fas fa-reply"></i>
+		</a>
+	</div>
+
+	<script src="js/anime.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+	<script src="js/chat.js"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-111003043-1"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'UA-111003043-1');
+	</script>
+</body>
