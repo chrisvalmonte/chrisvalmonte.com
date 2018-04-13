@@ -74,6 +74,7 @@ h6 {
 	display: -ms-flexbox;
 	display: flex;
 	height: 50px;
+	max-width: 1000px;
 	padding: 15px 0;
 	position: fixed;
 	top: 0;
@@ -408,11 +409,6 @@ footer .logo::before {
 		display: none;
 	}
 
-	#site-nav {
-		position: -webkit-sticky;
-		position: sticky;
-	}
-
 	/* Allow scrolling in case of viewport resize */
 	body.nav-menu-open {
 		overflow: auto;
@@ -424,6 +420,10 @@ footer .logo::before {
 }
 
 @media screen and (min-width: 600px) {
+	header {
+		margin-top: 110px;
+	}
+
 	#work {
 		margin-bottom: 50px;
 	}
