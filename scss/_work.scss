@@ -19,7 +19,6 @@
 	}
 
 	.project {
-		background-position: center;
 		background-repeat: no-repeat;
 		height: 300px;
 		width: 100%;
@@ -67,47 +66,35 @@
 
 
 
+@mixin project-bg($image, $position, $overlay-color) {
+	background-image: $image;
+	background-position: $position;
+
+	.overlay:hover,
+	.overlay:focus {
+		background-color: $overlay-color;
+	}
+}
+
 #project1 {
-	background-image: url('../img/project1.jpg');
+	@include project-bg(url('../img/project1.jpg'), center, rgba(#f39231, .99));
 
 	.title,
 	.description {
 		color: #000;
 	}
-
-	.overlay:hover,
-	.overlay:focus {
-		background-color: rgba(243, 146, 49, .99); /* #f39231 */
-	}
 }
 
 #project2 {
-	background-image: url('../img/project2.jpg');
-
-	.overlay:hover,
-	.overlay:focus {
-		background-color: rgba(47, 89, 126, .95); /* #2f597e */
-	}
+	@include project-bg(url('../img/project2.jpg'), center, rgba(#2f597e, .95));
 }
 
 #project3 {
-	background-image: url('../img/project3.jpg');
-
-	.overlay:hover,
-	.overlay:focus {
-		background-color: rgba(31, 69, 34, .95); /* #1f4522 */
-	}
+	@include project-bg(url('../img/project3.jpg'), center, rgba(#1f4522, .95));
 }
 
 #project4 {
-	background-image: url('../img/project4.jpg');
-	background-position: left !important;
-
-	.overlay:hover,
-	.overlay:focus {
-		background-color: rgba(191, 55, 36, .95); /* #bf3724 */
-	}
-
+	@include project-bg(url('../img/project4.jpg'), left, rgba(#bf3724, .95));
 }
 
 @media screen and (min-width: $screen-md-min) {

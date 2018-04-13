@@ -207,7 +207,6 @@ footer {
     flex-wrap: wrap;
     width: 100%; }
   #work .project {
-    background-position: center;
     background-repeat: no-repeat;
     height: 300px;
     width: 100%; }
@@ -240,36 +239,35 @@ footer {
     padding: 30px; }
 
 #project1 {
-  background-image: url("../img/project1.jpg"); }
+  background-image: url("../img/project1.jpg");
+  background-position: center; }
+  #project1 .overlay:hover,
+  #project1 .overlay:focus {
+    background-color: rgba(243, 146, 49, 0.99); }
   #project1 .title,
   #project1 .description {
     color: #000; }
-  #project1 .overlay:hover,
-  #project1 .overlay:focus {
-    background-color: rgba(243, 146, 49, 0.99);
-    /* #f39231 */ }
 
 #project2 {
-  background-image: url("../img/project2.jpg"); }
+  background-image: url("../img/project2.jpg");
+  background-position: center; }
   #project2 .overlay:hover,
   #project2 .overlay:focus {
-    background-color: rgba(47, 89, 126, 0.95);
-    /* #2f597e */ }
+    background-color: rgba(47, 89, 126, 0.95); }
 
 #project3 {
-  background-image: url("../img/project3.jpg"); }
+  background-image: url("../img/project3.jpg");
+  background-position: center; }
   #project3 .overlay:hover,
   #project3 .overlay:focus {
-    background-color: rgba(31, 69, 34, 0.95);
-    /* #1f4522 */ }
+    background-color: rgba(31, 69, 34, 0.95); }
 
 #project4 {
   background-image: url("../img/project4.jpg");
-  background-position: left !important; }
+  background-position: left; }
   #project4 .overlay:hover,
   #project4 .overlay:focus {
-    background-color: rgba(191, 55, 36, 0.95);
-    /* #bf3724 */ }
+    background-color: rgba(191, 55, 36, 0.95); }
 
 @media screen and (min-width: 600px) {
   #project1,
