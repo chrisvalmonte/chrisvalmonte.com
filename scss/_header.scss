@@ -1,0 +1,49 @@
+@keyframes words {
+	0% { content: 'ninja'; }
+	20% { content: 'developer'; }
+	40% { content: 'designer'; }
+	60% { content: 'prototyper'; }
+	80% { content: 'enthusiast'; }
+	100% { content: 'ninja'; }
+}
+
+header {
+	margin-top: 80px;
+
+	@media screen and (min-width: $screen-sm-min) {
+		margin-top: 0;
+	}
+
+	@media screen and (min-width: $screen-md-min) {
+		margin-top: 110px;
+	}
+
+	.headline {
+		@media screen and (max-width: $screen-xxs) {
+			font-size: 1.25rem;
+		}
+
+		@media screen and (max-width: $screen-xs-max) {
+			font-size: 1.5rem;
+		}
+	}
+
+	.summary {
+		color: #777;
+		font-style: italic;
+
+		@media screen and (max-width: $screen-xxs) {
+			font-size: 1.15rem;
+		}
+
+		@media screen and (max-width: $screen-xs-max) {
+			font-size: 1.25rem;
+			line-height: 1.5rem;
+		}
+	}
+
+	.word::after {
+		content: 'ninja';
+		animation: words 30s infinite 2s;
+	}
+}

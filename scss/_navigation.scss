@@ -1,0 +1,136 @@
+#site-nav {
+	-webkit-box-align: center;
+			-ms-flex-align: center;
+					align-items: center;
+	border-bottom: 1px solid #ddd;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	height: 50px;
+	max-width: 1000px;
+	padding: 15px 0;
+	position: fixed;
+	top: 0;
+	z-index: 50;
+
+	@media screen and (min-width: $screen-lg) {
+		padding: 30px 0;
+	}
+
+	.nav-links {
+		list-style: none;
+		margin-left: auto;
+		padding: 0;
+
+		@media screen and (max-width: $screen-xs-max) {
+			display: none;
+		}
+
+		@media screen and (min-width: $screen-lg) {
+			margin-right: 15px;
+		}
+
+		> li {
+			display: inline-block;
+		}
+
+		a {
+			padding: 10px 15px;
+			text-decoration: none;
+
+			&,
+			&:visited {
+				color: #000;
+			}
+
+			&:hover,
+			&:focus,
+			&.active {
+				color: #008000;
+			}
+
+			&.active {
+				font-weight: bold;
+			}
+
+			&.active:hover,
+			&.active:focus {
+				background-color: transparent;
+				border-radius: 0;
+			}
+		}
+	}
+} // #site-nav
+
+
+
+#nav-menu-drawer {
+	-webkit-box-align: center;
+			-ms-flex-align: center;
+					align-items: center;
+	background-color: #000;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+			-ms-flex-direction: column;
+					flex-direction: column;
+	height: 100%;
+	-webkit-box-pack: center;
+			-ms-flex-pack: center;
+					justify-content: center;
+	position: fixed;
+	-webkit-transform: translateY(-100%);
+					transform: translateY(-100%);
+	-webkit-transition: -webkit-transform 400ms ease;
+	transition: -webkit-transform 400ms ease;
+	transition: transform 400ms ease;
+	transition: transform 400ms ease, -webkit-transform 400ms ease;
+	width: 100%;
+
+	&.open {
+		-webkit-transform: translateY(0);
+						transform: translateY(0);
+	}
+
+	.nav-links {
+		list-style: none;
+		margin-top: 80px;
+		padding-left: 0;
+		text-align: center;
+
+		a {
+			color: #fff;
+			font-size: 2rem;
+			line-height: 8rem;
+			text-decoration: none;
+
+			&:hover {
+				color: #008000;
+			}
+		}
+	}
+} // #nav-menu-drawer
+
+#nav-menu {
+	margin-left: auto;
+	margin-right: 15px;
+}
+
+#nav-menu,
+#nav-menu-drawer {
+	@media screen and (min-width: $screen-sm-min) {
+		display: none;
+	}
+}
+
+body.nav-menu-open {
+	/* Prevent scrolling when #nav-menu-drawer is open */
+	overflow: hidden;
+
+	/* Allow scrolling in case of viewport resize */
+	@media screen and (min-width: $screen-sm-min) {
+			overflow: auto;
+	}
+}
