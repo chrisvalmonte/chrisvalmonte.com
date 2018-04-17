@@ -27,3 +27,4 @@ I will accept pull requests that optimize styles, images, or JavaScripts.
 * `css/chat.css`, forked from Julian Garnier's [original project](https://github.com/juliangarnier/juliangarnier.com) and modified.
 * `js/chat.js`, forked from Julian Garnier's [original project](https://github.com/juliangarnier/juliangarnier.com) and modified.
 * `js/anime.js`, forked from Julian Garnier's [original project](https://github.com/juliangarnier/juliangarnier.com).
+* [Font Awesome](https://fontawesome.com/) v5.0.2
