@@ -14,5 +14,5 @@ document
 function toggleNavMenu(event) {
 	document.querySelector('#nav-menu-drawer').classList.toggle('open');
 	document.querySelector('body').classList.toggle('nav-menu-open');
-	e.stopPropagation();
+	event.stopPropagation();
 }
