@@ -1,3 +1,30 @@
+#skip-link {
+	-webkit-box-align: center;
+			-ms-flex-align: center;
+					align-items: center;
+	border-bottom-right-radius: 5px;
+	background-color: #008000;
+	color: #fff;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	height: 50px;
+	-webkit-box-pack: center;
+			-ms-flex-pack: center;
+					justify-content: center;
+	left: 0;
+	padding: 0 15px;
+	position: absolute;
+	top: -50px;
+	z-index: 100;
+
+	&:focus {
+		top: 0;
+	}
+}
+
+
+
 #site-nav {
 	-webkit-box-align: center;
 			-ms-flex-align: center;
@@ -132,5 +159,11 @@ body.nav-menu-open {
 	/* Allow scrolling in case of viewport resize */
 	@media screen and (min-width: $screen-sm-min) {
 			overflow: auto;
+	}
+}
+
+.hide-from-drawer.hidden {
+	@media screen and (max-width: $screen-xs-max) {
+		visibility: hidden !important;
 	}
 }

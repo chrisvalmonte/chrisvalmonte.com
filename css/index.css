@@ -1,4 +1,26 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto");
+#skip-link {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-bottom-right-radius: 5px;
+  background-color: #008000;
+  color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 50px;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  left: 0;
+  padding: 0 15px;
+  position: absolute;
+  top: -50px;
+  z-index: 100; }
+  #skip-link:focus {
+    top: 0; }
+
 #site-nav {
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -97,6 +119,10 @@ body.nav-menu-open {
   @media screen and (min-width: 501px) {
     body.nav-menu-open {
       overflow: auto; } }
+
+@media screen and (max-width: 500px) {
+  .hide-from-drawer.hidden {
+    visibility: hidden !important; } }
 
 .logo {
   cursor: default;

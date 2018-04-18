@@ -23,6 +23,8 @@
 	</head>
 
 	<body>
+		<a id="skip-link" href="#work">Skip to main content</a>
+
 		<nav id="site-nav">
 			<span class="logo">Chris Valmonte</span>
 
@@ -42,7 +44,7 @@
 			<h2 class="summary">I create web products that are usable, responsive, and delightful.</h2>
 		</header>
 
-		<main id="work">
+		<main id="work" class="hide-from-drawer">
 			<section class="container">
 				<section id="project1" class="project w-67">
 					<a href="https://olathe.municipal.codes" target="_blank" class="overlay">
@@ -105,7 +107,7 @@
 		<footer>
 			<span class="logo">Chris Valmonte</span>
 
-			<div class="social-media">
+			<div class="social-media hide-from-drawer">
 				<a href="https://www.github.com/chrisvalmonte"><i class="fab fa-github"></i></a>
 				<a href="https://www.linkedin.com/in/chrisvalmonte"><i class="fab fa-linkedin"></i></a>
 				<a href="https://www.behance.net/chrisvalmonte"><i class="fab fa-behance"></i></a>
@@ -113,13 +115,13 @@
 			</div>
 		</footer>
 
-		<nav id="nav-menu-drawer">
+		<nav id="nav-menu-drawer" tabindex="-1">
 			<ul class="nav-links">
-				<li><a class="link" href="javascript:void(0)">Work</a></li>
+				<li><a class="link" href="javascript:void(0)" tabindex="-1">Work</a></li>
 				<!-- TODO: Create "About" page -->
 				<!-- <li><a href="#">About</a></li> -->
-				<li><a class="link" href="Valmonte-Resume.pdf" target="_blank">Resume</a></li>
-				<li><a class="link" href="chat.html">Chat</a></li>
+				<li><a class="link" href="Valmonte-Resume.pdf" target="_blank" tabindex="-1">Resume</a></li>
+				<li><a class="link" href="chat.html" tabindex="-1">Chat</a></li>
 			</ul>
 		</nav>
 
