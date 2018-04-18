@@ -12,7 +12,9 @@ document
 });
 
 function toggleNavMenu(event) {
-	document.querySelector('#nav-menu-drawer').classList.toggle('open');
+	var drawer = document.querySelector('#nav-menu-drawer');
+	drawer.classList.toggle('open');
+	drawer.focus();
 	document.querySelector('body').classList.toggle('nav-menu-open');
 	event.stopPropagation();
 }
