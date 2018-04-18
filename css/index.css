@@ -120,6 +120,10 @@ body.nav-menu-open {
     body.nav-menu-open {
       overflow: auto; } }
 
+@media screen and (max-width: 500px) {
+  .hide-from-drawer.hidden {
+    visibility: hidden !important; } }
+
 .logo {
   cursor: default;
   font-weight: bold;

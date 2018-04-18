@@ -23,6 +23,8 @@
 	}
 }
 
+
+
 #site-nav {
 	-webkit-box-align: center;
 			-ms-flex-align: center;
@@ -157,5 +159,11 @@ body.nav-menu-open {
 	/* Allow scrolling in case of viewport resize */
 	@media screen and (min-width: $screen-sm-min) {
 			overflow: auto;
+	}
+}
+
+.hide-from-drawer.hidden {
+	@media screen and (max-width: $screen-xs-max) {
+		visibility: hidden !important;
 	}
 }
