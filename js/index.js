@@ -5,7 +5,7 @@ document
 	if(!drawer.classList.contains('open'))
 		return;
 
-		toggleNavMenuDrawer(e);
+	toggleNavMenuDrawer(e);
 });
 
 document
@@ -25,9 +25,18 @@ function toggleNavMenuDrawer(event) {
 	var drawer = document.querySelector('#nav-menu-drawer');
 	drawer.classList.toggle('open');
 	drawer.querySelectorAll('.link').forEach(function(link) {
-		toggleTabIndex(link);
+		// Toggle tab index of link
+		link.getAttribute('tabindex') === '0'
+			? link.setAttribute('tabindex', '-1')
+			: link.setAttribute('tabindex', '0');
 	});
 	drawer.focus();
+
+	// Toggle ARIA expanded role of the navigation menu button
+	var navMenuBtn = document.querySelector('#nav-menu');
+	navMenuBtn.getAttribute('aria-expanded') === 'false'
+		? navMenuBtn.setAttribute('aria-expanded', 'true')
+		: navMenuBtn.setAttribute('aria-expanded', 'false');
 
 	document
 	.querySelectorAll('.hide-from-drawer')
@@ -38,10 +47,4 @@ function toggleNavMenuDrawer(event) {
 	document.querySelector('body').classList.toggle('nav-menu-open');
 
 	event.stopPropagation();
-}
-
-function toggleTabIndex(el) {
-	el.getAttribute('tabindex') === '0'
-		? el.setAttribute('tabindex', '-1')
-		: el.setAttribute('tabindex', '0');
 }
