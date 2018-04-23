@@ -1,7 +1,7 @@
 document
 .querySelector('#skip-link')
 .addEventListener('click', function(e) {
-	if(!document.querySelector('#nav-menu-drawer').getAttribute('aria-expanded'))
+	if(document.querySelector('#nav-menu-drawer').getAttribute('aria-expanded') === 'false')
 		return;
 
 	toggleNavMenuDrawer(e);
