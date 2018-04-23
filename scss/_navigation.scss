@@ -76,6 +76,11 @@
 				color: #008000;
 			}
 
+			&:not(.active):hover,
+			&:not(.active):focus {
+				text-decoration: underline;
+			}
+
 			&.active {
 				font-weight: bold;
 			}
@@ -116,7 +121,7 @@
 	transition: transform 400ms ease, -webkit-transform 400ms ease;
 	width: 100%;
 
-	&.open {
+	&[aria-expanded="true"] { // Drawer is open
 		-webkit-transform: translateY(0);
 						transform: translateY(0);
 	}
@@ -133,7 +138,8 @@
 			line-height: 8rem;
 			text-decoration: none;
 
-			&:hover {
+			&:hover,
+			&:focus {
 				color: #008000;
 			}
 		}
@@ -143,6 +149,13 @@
 #nav-menu {
 	margin-left: auto;
 	margin-right: 15px;
+
+	&:hover,
+	&:focus {
+		background-color: #008000;
+		border-color: #008000;
+		color: #fff;
+	}
 }
 
 #nav-menu,
