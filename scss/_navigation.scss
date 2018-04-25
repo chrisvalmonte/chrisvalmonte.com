@@ -167,11 +167,11 @@
 
 body.nav-menu-open {
 	/* Prevent scrolling when #nav-menu-drawer is open */
-	overflow: hidden;
+	position: fixed;
 
 	/* Allow scrolling in case of viewport resize */
 	@media screen and (min-width: $screen-sm-min) {
-			overflow: auto;
+			position: relative;
 	}
 }
 
