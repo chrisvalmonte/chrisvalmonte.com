@@ -1,10 +1,9 @@
 @keyframes words {
-	0% { content: 'ninja'; }
-	20% { content: 'developer'; }
-	40% { content: 'designer'; }
-	60% { content: 'prototyper'; }
-	80% { content: 'enthusiast'; }
-	100% { content: 'ninja'; }
+	0% { content: 'developer'; }
+	25% { content: 'designer'; }
+	50% { content: 'accessibility advocate'; }
+	75% { content: 'ninja'; }
+	100% { content: 'developer'; }
 }
 
 header {
@@ -39,7 +38,7 @@ header {
 	}
 
 	.word::after {
-		content: 'ninja';
+		content: 'developer';
 		animation: words 30s infinite 2s;
 	}
 }

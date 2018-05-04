@@ -151,17 +151,15 @@ footer .logo::before {
 
 @keyframes words {
   0% {
-    content: 'ninja'; }
-  20% {
     content: 'developer'; }
-  40% {
+  25% {
     content: 'designer'; }
-  60% {
-    content: 'prototyper'; }
-  80% {
-    content: 'enthusiast'; }
+  50% {
+    content: 'accessibility advocate'; }
+  75% {
+    content: 'ninja'; }
   100% {
-    content: 'ninja'; } }
+    content: 'developer'; } }
 header {
   margin-top: 80px; }
   @media screen and (min-width: 1000px) {
@@ -184,7 +182,7 @@ header {
         font-size: 1.25rem;
         line-height: 1.5rem; } }
   header .word::after {
-    content: 'ninja';
+    content: 'developer';
     animation: words 30s infinite 2s; }
 
 footer {
