@@ -1,138 +1,43 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Chris Valmonte</title>
+<!doctype html>
+<head>
+  <title>Chris Valmonte</title>
 
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="I design and code things on the web." />
-		<meta property="og:site_name" content="chrisvalmonte.com" />
-		<meta property="og:title" content="Chris Valmonte" />
-		<meta property="og:description" content="I design and code things on the web." />
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content="http://chrisvalmonte.com" />
-		<meta property="og:image" content="http://chrisvalmonte.com/img/og-image.png" />
-		<meta property="og:image:type" content="image/png" />
-		<meta property="og:image:width" content="768" />
-		<meta property="og:image:height" content="416" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="description" content="I design and code things on the web." />
+  <meta property="og:site_name" content="chrisvalmonte.com" />
+  <meta property="og:title" content="Chris Valmonte" />
+  <meta property="og:description" content="I design and code things on the web." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="http://chrisvalmonte.com" />
+  <meta property="og:image" content="http://chrisvalmonte.com/img/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="768" />
+  <meta property="og:image:height" content="416" />
 
-		<link rel="icon" type="image/png" href="img/favicon.png" />
-		<link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
-		<link rel="stylesheet" href="css/index.css">
-		<link href="https://use.fontawesome.com/releases/v5.0.2/css/all.css" rel="stylesheet">
-	</head>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+  <link rel="stylesheet" type="text/css" media="screen" href="css/styles.css" />
+  <link href="https://use.fontawesome.com/releases/v5.0.2/css/all.css" rel="stylesheet">
+</head>
+<body>
+  <div class="messages"></div>
 
-	<body>
-		<a id="skip-link" href="#work">Skip to main content</a>
+  <div class="fab">
+    <a href="mailto:hello@chrisvalmonte.com" aria-label="Email Chris Valmonte">
+      <i class="fas fa-reply"></i>
+    </a>
+  </div>
 
-		<nav id="site-nav">
-			<span class="logo">Chris Valmonte</span>
+  <script src="js/anime.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <script src="js/scripts.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111003043-1"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-			<ul class="nav-links">
-				<li><a href="javascript:void(0)" class="active">Work</a></li>
-				<!-- TODO: Create "About" page -->
-				<!-- <li><a href="#">About</a></li> -->
-				<li><a href="Valmonte-Resume.pdf" target="_blank">Resume</a></li>
-				<li><a href="chat.html">Chat</a></li>
-			</ul>
-
-			<button id="nav-menu" class="btn" aria-controls="nav-menu-drawer">Menu</button>
-		</nav>
-
-		<header>
-			<h1 class="headline">I'm Chris, a web <span class="word"></span>.</h1>
-			<h2 class="summary">I create web products that are usable, responsive, and delightful.</h2>
-		</header>
-
-		<main id="work" class="hide-from-drawer">
-			<section class="container">
-				<section id="project1" class="project w-67" title="Olathe, Kansas Municipal Code Interface Customization">
-					<a href="https://olathe.municipal.codes" target="_blank" class="overlay" aria-label="Olathe, Kansas Municipal Code Interface Customization">
-						<div class="overlay-inner">
-							<h3 class="title">Web Interface Customization</h3>
-							<p class="description">
-								I customized Code Publishing Company's modern web interface to match the style of the Olathe, Kansas, municipal government's website.
-								<br>
-								<br>
-								View the live website →
-							</p>
-						</div>
-					</a>
-				</section>
-				<section id="project2" class="project w-33" title="Code Publishing Company's Share Feature">
-					<a href="https://www.behance.net/gallery/60122127/CPC-Share-Modal" target="_blank" class="overlay" aria-label="Code Publishing Company's Share Feature">
-						<div class="overlay-inner">
-							<h3 class="title">Share Modal Dialog</h3>
-							<p class="description">
-								I redesigned and implemented the share feature for Code Publishing Company's legal hosting web application.
-								<br>
-								<br>
-								View on Behance →
-							</p>
-						</div>
-					</a>
-				</section>
-				<section id="project3" class="project w-33" title="Graduate App - Mobile Prototype">
-					<a href="https://xd.adobe.com/view/663443e3-edb5-482a-9517-6a38ce6de56a/" target="_blank" class="overlay" aria-label="Graduate App - Mobile Prototype">
-						<div class="overlay-inner">
-							<h3 class="title">Graduate App Mobile Concept</h3>
-							<p class="description">
-								Inspired by my bad experience when managing my graduate school applications from my mobile phone, I prototyped a redesign.
-								<br>
-								<br>
-								View the prototype →
-							</p>
-						</div>
-					</a>
-				</section>
-				<section id="project4" class="project w-67" title="Northwest Filipino-American Student Alliance Conference Website">
-					<a href="https://github.com/chrisvalmonte/nwfasaisangbagsak2017.com" target="_blank" class="overlay" aria-label="Northwest Filipino-American Student Alliance Conference Website">
-						<div class="overlay-inner">
-							<h3 class="title">NWFASA's Conference Website</h3>
-							<p class="description">
-								I created a responsive website for the Northwest Filipino-American Student Association's 22nd annual Conference.
-								<br>
-								<br>
-								View on GitHub →
-							</p>
-						</div>
-					</a>
-				</section>
-
-				<!-- TODO: Add Nanodegree projects -->
-
-			</section> <!-- .container -->
-		</main>
-
-		<footer>
-			<span class="logo">Chris Valmonte</span>
-
-			<div class="social-media hide-from-drawer">
-				<a href="https://www.github.com/chrisvalmonte" aria-label="Github"><i class="fab fa-github"></i></a>
-				<a href="https://www.linkedin.com/in/chrisvalmonte" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-				<a href="https://www.behance.net/chrisvalmonte" aria-label="Behance"><i class="fab fa-behance"></i></a>
-				<a href="https://www.instagram.com/chrisvalmonte.ig/" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-			</div>
-		</footer>
-
-		<nav id="nav-menu-drawer" tabindex="-1" aria-expanded="false">
-			<ul class="nav-links">
-				<li><a class="link" href="javascript:void(0)" tabindex="-1">Work</a></li>
-				<!-- TODO: Create "About" page -->
-				<!-- <li><a href="#">About</a></li> -->
-				<li><a class="link" href="Valmonte-Resume.pdf" target="_blank" tabindex="-1">Resume</a></li>
-				<li><a class="link" href="chat.html" tabindex="-1">Chat</a></li>
-			</ul>
-		</nav>
-
-		<script src="js/index.js"></script>
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-111003043-1"></script><!-- Global site tag (gtag.js) - Google Analytics -->
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
-
-			gtag('config', 'UA-111003043-1');
-		</script>
-	</body>
-</html>
+    gtag('config', 'UA-111003043-1');
+  </script>
+</body>
