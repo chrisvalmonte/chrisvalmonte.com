@@ -8,7 +8,7 @@
  * Copyright (c) 2016 Julian Garnier
  */
 
-window.onload = function() {
+window.onload = function () {
   var fab = document.querySelector('.fab > a');
   fab.className += 'open';
 
@@ -19,20 +19,20 @@ window.onload = function() {
   }
 };
 
-var Messages = (function() {
+var Messages = (function () {
   var _messagesEl = document.querySelector('.messages');
   var _typingSpeed = 20;
   var _loadingText = '<b>•</b><b>•</b><b>•</b>';
   var _messageIndex = 0;
 
-  var _getCurrentTime = function() {
+  var _getCurrentTime = function () {
     var date = new Date();
     var hours = date.getHours();
     var minutes = date.getMinutes();
     return hours + minutes * 0.01;
   };
 
-  var _getCurrentTimeMessage = function() {
+  var _getCurrentTimeMessage = function () {
     if (_getCurrentTime() >= 5 && _getCurrentTime() < 17)
       return 'Have a nice day!';
     if (_getCurrentTime() >= 17 && _getCurrentTime() < 19)
@@ -45,22 +45,24 @@ var Messages = (function() {
     'Hey there 👋',
     "I'm Chris",
     'I design and code things on the web',
-    'I\'m looking for a mid-level SDE role.<br />Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
-    '<a href="https://behance.net/chrisvalmonte" target="_blank">behance.net/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte" target="_blank">linkedin.com/in/chrisvalmonte</a><br><a href="https://instagram.com/chrisvalmonte.ig" target="_blank">instagram.com/chrisvalmonte.ig</a>',
-    _getCurrentTimeMessage(),
+    'Currently tracking COVID-19 at<br/><a href="https://covid19-confirmed.com" rel="noopener noreferrer" target="_blank">covid19-confirmed.com</a>',
+    '<a href="https://behance.net/chrisvalmonte" rel="noopener noreferrer" target="_blank">behance.net/chrisvalmonte</a><br><a href="https://github.com/chrisvalmonte" rel="noopener noreferrer" target="_blank">github.com/chrisvalmonte</a><br><a href="https://linkedin.com/in/chrisvalmonte" rel="noopener noreferrer" target="_blank">linkedin.com/in/chrisvalmonte</a>',
+    'Say <a href="mailto:hello@chrisvalmonte.com">hello@chrisvalmonte.com</a>',
+    'Stay home. Stay healthy.',
+    // _getCurrentTimeMessage(),
   ];
 
-  var _getFontSize = function() {
+  var _getFontSize = function () {
     return parseInt(
       getComputedStyle(document.body).getPropertyValue('font-size'),
     );
   };
 
-  var _pxToRem = function(px) {
+  var _pxToRem = function (px) {
     return px / _getFontSize() + 'rem';
   };
 
-  var _createBubbleElements = function(message, position) {
+  var _createBubbleElements = function (message, position) {
     var bubbleEl = document.createElement('div');
     var messageEl = document.createElement('span');
     var loadingEl = document.createElement('span');
@@ -82,7 +84,7 @@ var Messages = (function() {
     };
   };
 
-  var _getDimensions = function(elements) {
+  var _getDimensions = function (elements) {
     return (dimensions = {
       loading: {
         w: '4rem',
@@ -99,7 +101,7 @@ var Messages = (function() {
     });
   };
 
-  var _prepareMessage = function(message, position) {
+  var _prepareMessage = function (message, position) {
     var loadingDuration =
       message.replace(/<(?:.|\n)*?>/gm, '').length * _typingSpeed + 500;
     var elements = _createBubbleElements(message, position);
@@ -150,18 +152,18 @@ var Messages = (function() {
       duration: 300,
       loop: true,
       direction: 'alternate',
-      delay: function(i) {
+      delay: function (i) {
         return i * 100 + 50;
       },
     });
-    setTimeout(function() {
+    setTimeout(function () {
       loadingLoop.pause();
       dotsPulse.restart({
         opacity: 0,
         scale: 0,
         loop: false,
         direction: 'forwards',
-        update: function(a) {
+        update: function (a) {
           if (
             a.progress >= 65 &&
             elements.bubble.classList.contains('is-loading')
@@ -181,7 +183,7 @@ var Messages = (function() {
         height: [dimensions.loading.h, dimensions.bubble.h],
         marginTop: 0,
         marginLeft: 0,
-        begin: function() {
+        begin: function () {
           if (_messageIndex < _messages.length)
             elements.bubble.classList.remove('cornered');
         },
@@ -192,17 +194,17 @@ var Messages = (function() {
   var COOKIE_KEY = 'chrissaid';
   var COOKIE_VALUE = _getCurrentTimeMessage();
 
-  var checkMessageCookie = function() {
+  var checkMessageCookie = function () {
     if (!Cookies.get(COOKIE_KEY)) return false;
 
     return true;
   };
 
-  var setMessageCookie = function() {
+  var setMessageCookie = function () {
     Cookies.set(COOKIE_KEY, COOKIE_VALUE, { expires: 1 });
   };
 
-  var displaySentMessages = function() {
+  var displaySentMessages = function () {
     var msgContainer = document.getElementsByClassName('messages')[0];
 
     for (var i = 0; i < _messages.length - 1; i++) {
@@ -221,7 +223,7 @@ var Messages = (function() {
     msgContainer.appendChild(document.createElement('br'));
   };
 
-  var sendMessages = function() {
+  var sendMessages = function () {
     var message = _messages[_messageIndex];
     if (!message) return;
     _prepareMessage(message);
