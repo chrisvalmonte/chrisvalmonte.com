@@ -25,21 +25,22 @@ var Messages = (function () {
   var _loadingText = '<b>•</b><b>•</b><b>•</b>';
   var _messageIndex = 0;
 
-  var _getCurrentTime = function () {
-    var date = new Date();
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    return hours + minutes * 0.01;
-  };
+  // TODO: Add back when needed again
+  // var _getCurrentTime = function () {
+  //   var date = new Date();
+  //   var hours = date.getHours();
+  //   var minutes = date.getMinutes();
+  //   return hours + minutes * 0.01;
+  // };
 
-  var _getCurrentTimeMessage = function () {
-    if (_getCurrentTime() >= 5 && _getCurrentTime() < 17)
-      return 'Have a nice day!';
-    if (_getCurrentTime() >= 17 && _getCurrentTime() < 19)
-      return 'Have a good evening!';
-    if (_getCurrentTime() >= 19 || _getCurrentTime() < 5)
-      return 'Have a good night!';
-  };
+  // var _getCurrentTimeMessage = function () {
+  //   if (_getCurrentTime() >= 5 && _getCurrentTime() < 17)
+  //     return 'Have a nice day!';
+  //   if (_getCurrentTime() >= 17 && _getCurrentTime() < 19)
+  //     return 'Have a good evening!';
+  //   if (_getCurrentTime() >= 19 || _getCurrentTime() < 5)
+  //     return 'Have a good night!';
+  // };
 
   var _messages = [
     'Hey there 👋',
@@ -192,7 +193,7 @@ var Messages = (function () {
   };
 
   var COOKIE_KEY = 'chrissaid';
-  var COOKIE_VALUE = _getCurrentTimeMessage();
+  // var COOKIE_VALUE = _getCurrentTimeMessage();
 
   var checkMessageCookie = function () {
     if (!Cookies.get(COOKIE_KEY)) return false;
@@ -201,26 +202,30 @@ var Messages = (function () {
   };
 
   var setMessageCookie = function () {
-    Cookies.set(COOKIE_KEY, COOKIE_VALUE, { expires: 1 });
+    Cookies.set(COOKIE_KEY, 'hello', { expires: 1 });
   };
 
   var displaySentMessages = function () {
-    var msgContainer = document.getElementsByClassName('messages')[0];
-
-    for (var i = 0; i < _messages.length - 1; i++) {
+    var msgFrag = document.createDocumentFragment();
+    for (var i = 0; i < _messages.length; i++) {
       var message = document.createElement('div');
       message.className += 'bubble left';
       message.innerHTML = _messages[i];
-      msgContainer.appendChild(message);
-      msgContainer.appendChild(document.createElement('br'));
+      if (i === _messages.length - 1) message.className += ' cornered';
+
+      msgFrag.appendChild(message);
+      msgFrag.appendChild(document.createElement('br'));
     }
 
+    var msgContainer = document.getElementsByClassName('messages')[0];
+    msgContainer.appendChild(msgFrag);
+
     // Current Time Message
-    var current = document.createElement('div');
-    current.className += 'bubble left cornered';
-    current.innerHTML = Cookies.get(COOKIE_KEY);
-    msgContainer.appendChild(current);
-    msgContainer.appendChild(document.createElement('br'));
+    // var current = document.createElement('div');
+    // current.className += 'bubble left cornered';
+    // current.innerHTML = Cookies.get(COOKIE_KEY);
+    // msgContainer.appendChild(current);
+    // msgContainer.appendChild(document.createElement('br'));
   };
 
   var sendMessages = function () {
