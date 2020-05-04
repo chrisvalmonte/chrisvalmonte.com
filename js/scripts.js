@@ -9,7 +9,7 @@
  */
 
 window.onload = function () {
-  var fab = document.querySelector('.fab > a');
+  const fab = document.querySelector('.fab > a');
   fab.className += 'open';
 
   if (Messages.sent()) Messages.displaySent();
@@ -19,11 +19,11 @@ window.onload = function () {
   }
 };
 
-var Messages = (function () {
-  var _messagesEl = document.querySelector('.messages');
-  var _typingSpeed = 20;
-  var _loadingText = '<b>•</b><b>•</b><b>•</b>';
-  var _messageIndex = 0;
+const Messages = (function () {
+  const _messagesEl = document.querySelector('.messages');
+  const _typingSpeed = 20;
+  const _loadingText = '<b>•</b><b>•</b><b>•</b>';
+  let _messageIndex = 0;
 
   // TODO: Add back when needed again
   // var _getCurrentTime = function () {
@@ -42,7 +42,7 @@ var Messages = (function () {
   //     return 'Have a good night!';
   // };
 
-  var _messages = [
+  const _messages = [
     'Hey there 👋',
     "I'm Chris",
     'I design and code things on the web',
@@ -53,20 +53,21 @@ var Messages = (function () {
     // _getCurrentTimeMessage(),
   ];
 
-  var _getFontSize = function () {
+  const _getFontSize = function () {
     return parseInt(
       getComputedStyle(document.body).getPropertyValue('font-size'),
     );
   };
 
-  var _pxToRem = function (px) {
+  const _pxToRem = function (px) {
     return px / _getFontSize() + 'rem';
   };
 
-  var _createBubbleElements = function (message, position) {
-    var bubbleEl = document.createElement('div');
-    var messageEl = document.createElement('span');
-    var loadingEl = document.createElement('span');
+  const _createBubbleElements = function (message, position) {
+    const bubbleEl = document.createElement('div');
+    const messageEl = document.createElement('span');
+    const loadingEl = document.createElement('span');
+
     bubbleEl.classList.add('bubble');
     bubbleEl.classList.add('is-loading');
     bubbleEl.classList.add('cornered');
@@ -78,6 +79,7 @@ var Messages = (function () {
     bubbleEl.appendChild(loadingEl);
     bubbleEl.appendChild(messageEl);
     bubbleEl.style.opacity = 0;
+
     return {
       bubble: bubbleEl,
       message: messageEl,
@@ -85,7 +87,7 @@ var Messages = (function () {
     };
   };
 
-  var _getDimensions = function (elements) {
+  const _getDimensions = function (elements) {
     return (dimensions = {
       loading: {
         w: '4rem',
@@ -102,27 +104,28 @@ var Messages = (function () {
     });
   };
 
-  var _prepareMessage = function (message, position) {
-    var loadingDuration =
+  const _prepareMessage = function (message, position) {
+    const loadingDuration =
       message.replace(/<(?:.|\n)*?>/gm, '').length * _typingSpeed + 500;
-    var elements = _createBubbleElements(message, position);
+    const elements = _createBubbleElements(message, position);
     _messagesEl.appendChild(elements.bubble);
     _messagesEl.appendChild(document.createElement('br'));
-    var dimensions = _getDimensions(elements);
+    const dimensions = _getDimensions(elements);
     elements.bubble.style.width = '0rem';
     elements.bubble.style.height = dimensions.loading.h;
     elements.message.style.width = dimensions.message.w;
     elements.message.style.height = dimensions.message.h;
     elements.bubble.style.opacity = 1;
-    var bubbleOffset = elements.bubble.offsetTop + elements.bubble.offsetHeight;
+    const bubbleOffset =
+      elements.bubble.offsetTop + elements.bubble.offsetHeight;
     if (bubbleOffset > _messagesEl.offsetHeight) {
-      var scrollMessages = anime({
+      const scrollMessages = anime({
         targets: _messagesEl,
         scrollTop: bubbleOffset,
         duration: 750,
       });
     }
-    var bubbleSize = anime({
+    const bubbleSize = anime({
       targets: elements.bubble,
       width: ['0rem', dimensions.loading.w],
       marginTop: ['2.5rem', 0],
@@ -130,7 +133,7 @@ var Messages = (function () {
       duration: 800,
       easing: 'easeOutElastic',
     });
-    var loadingLoop = anime({
+    const loadingLoop = anime({
       targets: elements.bubble,
       scale: [1.05, 0.95],
       duration: 1100,
@@ -138,7 +141,7 @@ var Messages = (function () {
       direction: 'alternate',
       easing: 'easeInOutQuad',
     });
-    var dotsStart = anime({
+    const dotsStart = anime({
       targets: elements.loading,
       translateX: ['-2rem', '0rem'],
       scale: [0.5, 1],
@@ -146,7 +149,7 @@ var Messages = (function () {
       delay: 25,
       easing: 'easeOutElastic',
     });
-    var dotsPulse = anime({
+    const dotsPulse = anime({
       targets: elements.bubble.querySelectorAll('b'),
       scale: [1, 1.25],
       opacity: [0.5, 1],
@@ -192,23 +195,23 @@ var Messages = (function () {
     }, loadingDuration - 50);
   };
 
-  var COOKIE_KEY = 'chrissaid';
+  const COOKIE_KEY = 'chrissaid';
   // var COOKIE_VALUE = _getCurrentTimeMessage();
 
-  var checkMessageCookie = function () {
+  const checkMessageCookie = function () {
     if (!Cookies.get(COOKIE_KEY)) return false;
 
     return true;
   };
 
-  var setMessageCookie = function () {
+  const setMessageCookie = function () {
     Cookies.set(COOKIE_KEY, 'hello', { expires: 1 });
   };
 
-  var displaySentMessages = function () {
-    var msgFrag = document.createDocumentFragment();
-    for (var i = 0; i < _messages.length; i++) {
-      var message = document.createElement('div');
+  const displaySentMessages = function () {
+    const msgFrag = document.createDocumentFragment();
+    for (let i = 0; i < _messages.length; i++) {
+      const message = document.createElement('div');
       message.className += 'bubble left';
       message.innerHTML = _messages[i];
       if (i === _messages.length - 1) message.className += ' cornered';
@@ -217,7 +220,7 @@ var Messages = (function () {
       msgFrag.appendChild(document.createElement('br'));
     }
 
-    var msgContainer = document.getElementsByClassName('messages')[0];
+    const msgContainer = document.getElementsByClassName('messages')[0];
     msgContainer.appendChild(msgFrag);
 
     // Current Time Message
@@ -228,8 +231,8 @@ var Messages = (function () {
     // msgContainer.appendChild(document.createElement('br'));
   };
 
-  var sendMessages = function () {
-    var message = _messages[_messageIndex];
+  const sendMessages = function () {
+    let message = _messages[_messageIndex];
     if (!message) return;
     _prepareMessage(message);
     ++_messageIndex;
