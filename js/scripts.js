@@ -12,30 +12,11 @@ const Messages = (function () {
   const _loadingText = '<b>•</b><b>•</b><b>•</b>';
   let _messageIndex = 0;
 
-  const _getCurrentTime = function () {
-    const date = new Date();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    return hours + minutes * 0.01;
-  };
-
-  const _getCurrentTimeMessage = function () {
-    const t = _getCurrentTime();
-    if (t >= 5 && t < 9) return { action: 'enjoying my morning coffee', goodbye: "What's up?" };
-    if (t >= 9 && t < 13) return { action: 'busy programming..', goodbye: 'Talk to you later!' };
-    if (t >= 13 && t < 17) return { action: 'in a meeting..', goodbye: 'Talk to you later!' };
-    if (t >= 17 && t < 19) return { action: 'having dinner with my family', goodbye: 'Have a good evening!' };
-    return { action: "changing my son's diaper..", goodbye: "I'll ttyl, so good night!" };
-  };
-
   const _messages = [
     'Hey 👋',
     "I'm Christopher",
     'I build experiences on the web',
-    'Check out some of my work',
     '<a href="https://behance.net/chrisvalmonte" rel="noopener noreferrer" target="_blank">behance.net/chrisvalmonte</a><br><a href="https://github.com/chrisvalmonte" rel="noopener noreferrer" target="_blank">github.com/chrisvalmonte</a>',
-    'Currently ' + _getCurrentTimeMessage().action,
-    _getCurrentTimeMessage().goodbye,
   ];
 
   const _getFontSize = function () {
