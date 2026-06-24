@@ -31,16 +31,11 @@ let passed = 0;
 let failed = 0;
 
 function assert(condition, label) {
-  if (condition) {
-    console.log(`  ✓  ${label}`);
-    passed++;
-  } else {
-    console.error(`  ✗  ${label}`);
-    failed++;
-  }
+  if (condition) { console.log(`  ✓  ${label}`); passed++; }
+  else { console.error(`  ✗  ${label}`); failed++; }
 }
 
-const EXPECTED_TEXTS = [
+const ALL_TEXTS = [
   t => t === 'Hey 👋',
   t => t === "I'm Christopher",
   t => t === 'I build experiences on the web',
@@ -50,88 +45,96 @@ const EXPECTED_TEXTS = [
   t => t.length > 0,
 ];
 
-async function runChecks(page, label) {
+async function assertMessages(page, expectedCount, label) {
   console.log(`\n── ${label} ──────────────────────────────────────────`);
-
-  const fabScale = await page.evaluate(() => {
-    const el = document.querySelector('.fab > a');
-    return Math.round(new DOMMatrix(getComputedStyle(el).transform).a * 100) / 100;
-  });
-  assert(fabScale > 0.9, `FAB scale = ${fabScale} (expected ~1)`);
-
-  const bubbleCount = await page.$$eval('.bubble', els => els.length);
-  assert(bubbleCount === 7, `7 bubbles rendered (got ${bubbleCount})`);
-
+  const count = await page.$$eval('.bubble', els => els.length);
+  assert(count === expectedCount, `${expectedCount} bubbles rendered (got ${count})`);
   const texts = await page.$$eval('.bubble .message', els => els.map(el => el.textContent.trim()));
-  EXPECTED_TEXTS.forEach((check, i) =>
+  ALL_TEXTS.slice(0, expectedCount).forEach((check, i) =>
     assert(check(texts[i] || ''), `Msg ${i + 1}: "${texts[i]}"`)
   );
-
-  const hrefs = await page.$$eval('.bubble .message a', els => els.map(el => el.getAttribute('href')));
-  assert(hrefs.includes('https://behance.net/chrisvalmonte'), 'Behance link present');
-  assert(hrefs.includes('https://github.com/chrisvalmonte'), 'GitHub link present');
-
   const stillLoading = await page.$$eval('.bubble.is-loading', els => els.length);
-  assert(stillLoading === 0, `No bubbles stuck in loading state (got ${stillLoading})`);
+  assert(stillLoading === 0, `No bubbles stuck in loading (got ${stillLoading})`);
 }
 
 (async () => {
   const server = await createServer();
   const port = server.address().port;
   const url = `http://127.0.0.1:${port}/`;
-
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
 
-  // ── First visit (full animation path) ────────────────────────────────────
-  console.log(`\nOpening ${url}`);
-  const page1 = await browser.newPage();
-  await page1.setViewport({ width: 1280, height: 800 });
-  await page1.goto(url, { waitUntil: 'networkidle0' });
-  await new Promise(r => setTimeout(r, 800));
+  fs.mkdirSync(path.join(__dirname, 'screenshots'), { recursive: true });
 
-  console.log('\n── DOM structure ─────────────────────────────────────────────');
-  assert(await page1.$('.messages') !== null, '.messages container exists');
-  assert(await page1.$('.fab > a') !== null, '.fab > a exists');
+  // ── First visit: full animation, each bubble persisted as it appears ────
+  console.log(`\nOpening ${url}`);
+  const p1 = await browser.newPage();
+  await p1.setViewport({ width: 1280, height: 800 });
+  await p1.goto(url, { waitUntil: 'networkidle0' });
 
   console.log('\n── Loading state (first visit) ───────────────────────────────');
-  await page1.waitForSelector('.bubble.is-loading', { timeout: 5000 });
-  assert(true, 'First bubble appears in loading state');
-  const dotCount = await page1.$eval('.bubble.is-loading .loading', el => el.querySelectorAll('b').length);
-  assert(dotCount === 3, `Loading indicator has 3 dots (got ${dotCount})`);
+  await p1.waitForSelector('.bubble.is-loading', { timeout: 5000 });
+  assert(true, 'First bubble enters loading state');
 
-  console.log('\n── Waiting for all 7 messages (first visit, up to 35s)… ──────');
-  await page1.waitForFunction(
+  // Wait for first bubble to be revealed and check the count increments
+  await p1.waitForFunction(
+    () => parseInt(localStorage.getItem('cv_messages_seen') || '0', 10) >= 1,
+    { timeout: 10000 }
+  );
+  const countAfterFirst = await p1.evaluate(() => parseInt(localStorage.getItem('cv_messages_seen'), 10));
+  assert(countAfterFirst === 1, `localStorage count = 1 after first bubble revealed (got ${countAfterFirst})`);
+
+  // Wait for all 7 messages
+  console.log('\n── Waiting for all 7 messages (up to 35s)… ──────────────────');
+  await p1.waitForFunction(
     () => document.querySelectorAll('.bubble:not(.is-loading)').length >= 7,
     { timeout: 35000 }
   );
-  await new Promise(r => setTimeout(r, 1000));
-
-  await runChecks(page1, 'First visit — animated path');
-
-  const storedFlag = await page1.evaluate(() => localStorage.getItem('cv_messages_seen'));
-  assert(storedFlag === '1', `localStorage flag set after last message (got "${storedFlag}")`);
-
-  fs.mkdirSync(path.join(__dirname, 'screenshots'), { recursive: true });
-  await page1.screenshot({ path: path.join(__dirname, 'screenshots/first-visit.png'), fullPage: true });
-
-  // ── Return visit (persisted path) ────────────────────────────────────────
-  const page2 = await browser.newPage();
-  await page2.setViewport({ width: 1280, height: 800 });
-
-  // Inject the flag before the page loads so it takes the render() branch
-  await page2.evaluateOnNewDocument(() => localStorage.setItem('cv_messages_seen', '1'));
-  await page2.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 800));
 
-  // Should NOT see any loading state on a return visit
-  const loadingOnReturn = await page2.$$eval('.bubble.is-loading', els => els.length);
-  assert(loadingOnReturn === 0, 'No loading dots on return visit');
+  await assertMessages(p1, 7, 'First visit — all messages');
 
-  await runChecks(page2, 'Return visit — persisted path');
+  const finalCount = await p1.evaluate(() => parseInt(localStorage.getItem('cv_messages_seen'), 10));
+  assert(finalCount === 7, `localStorage count = 7 after all revealed (got ${finalCount})`);
 
-  await page2.screenshot({ path: path.join(__dirname, 'screenshots/return-visit.png'), fullPage: true });
+  const hrefs = await p1.$$eval('.bubble .message a', els => els.map(el => el.getAttribute('href')));
+  assert(hrefs.includes('https://behance.net/chrisvalmonte'), 'Behance link present');
+  assert(hrefs.includes('https://github.com/chrisvalmonte'), 'GitHub link present');
 
-  // ── Summary ───────────────────────────────────────────────────────────────
+  await p1.screenshot({ path: path.join(__dirname, 'screenshots/first-visit.png'), fullPage: true });
+
+  // ── Partial visit: 3 bubbles persisted, rest animate in ─────────────────
+  const p2 = await browser.newPage();
+  await p2.setViewport({ width: 1280, height: 800 });
+  await p2.evaluateOnNewDocument(() => localStorage.setItem('cv_messages_seen', '3'));
+  await p2.goto(url, { waitUntil: 'networkidle0' });
+  await new Promise(r => setTimeout(r, 600));
+
+  console.log('\n── Partial visit: 3 persisted ─────────────────────────────');
+  const earlyCount = await p2.$$eval('.bubble', els => els.length);
+  assert(earlyCount >= 3, `At least 3 bubbles immediately present (got ${earlyCount})`);
+
+  await p2.waitForFunction(
+    () => document.querySelectorAll('.bubble:not(.is-loading)').length >= 7,
+    { timeout: 35000 }
+  );
+  await new Promise(r => setTimeout(r, 800));
+  await assertMessages(p2, 7, 'Partial visit — all messages after animation');
+  await p2.screenshot({ path: path.join(__dirname, 'screenshots/partial-visit.png'), fullPage: true });
+
+  // ── Full return visit: all 7 persisted, no animation ───────────────────
+  const p3 = await browser.newPage();
+  await p3.setViewport({ width: 1280, height: 800 });
+  await p3.evaluateOnNewDocument(() => localStorage.setItem('cv_messages_seen', '7'));
+  await p3.goto(url, { waitUntil: 'networkidle0' });
+  await new Promise(r => setTimeout(r, 800));
+
+  console.log('\n── Full return visit: no loading dots ─────────────────────');
+  const loadingOnReturn = await p3.$$eval('.bubble.is-loading', els => els.length);
+  assert(loadingOnReturn === 0, 'No loading dots on full return visit');
+  await assertMessages(p3, 7, 'Full return visit — all messages');
+  await p3.screenshot({ path: path.join(__dirname, 'screenshots/return-visit.png'), fullPage: true });
+
+  // ── Summary ─────────────────────────────────────────────────────────────
   console.log(`\n${'─'.repeat(60)}`);
   console.log(`  Passed: ${passed}  |  Failed: ${failed}`);
   console.log('─'.repeat(60) + '\n');

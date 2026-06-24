@@ -3,12 +3,7 @@ const STORAGE_KEY = 'cv_messages_seen';
 window.onload = function () {
   const fab = document.querySelector('.fab > a');
   gsap.to(fab, { scale: 1, duration: 0.5, ease: 'power1.out' });
-
-  if (localStorage.getItem(STORAGE_KEY)) {
-    Messages.render();
-  } else {
-    Messages.send();
-  }
+  Messages.init();
 };
 
 const Messages = (function () {
@@ -66,7 +61,7 @@ const Messages = (function () {
     loadingEl.innerHTML = _loadingText;
     bubbleEl.appendChild(loadingEl);
     bubbleEl.appendChild(messageEl);
-    gsap.set(bubbleEl, { opacity: 0 });
+    bubbleEl.style.opacity = '0';
 
     return { bubble: bubbleEl, message: messageEl, loading: loadingEl };
   };
@@ -96,21 +91,18 @@ const Messages = (function () {
     gsap.set(elements.bubble, { width: '0rem', height: dimensions.loading.h, opacity: 1 });
     gsap.set(elements.message, { width: dimensions.message.w, height: dimensions.message.h });
 
-    // Entrance: bubble pops in to loading size
     const bubbleSizeTween = gsap.fromTo(
       elements.bubble,
       { width: '0rem', marginTop: '2.5rem', marginLeft: '-2.5rem' },
       { width: dimensions.loading.w, marginTop: 0, marginLeft: 0, duration: 0.55, ease: 'back.out(1.5)' }
     );
 
-    // Loading pulse: bubble breathes while "typing"
     const loadingLoop = gsap.fromTo(
       elements.bubble,
       { scale: 1.05 },
       { scale: 0.95, duration: 1.1, repeat: -1, yoyo: true, ease: 'power1.inOut' }
     );
 
-    // Dots staggered pulse
     const dots = Array.from(elements.bubble.querySelectorAll('b'));
     gsap.set(dots, { scale: 1, opacity: 0.5 });
     const dotsTweens = dots.map((dot, i) =>
@@ -136,6 +128,9 @@ const Messages = (function () {
           if (this.progress() >= 0.65 && elements.bubble.classList.contains('is-loading')) {
             elements.bubble.classList.remove('is-loading');
             gsap.to(elements.message, { opacity: 1, duration: 0.45 });
+            // Persist this bubble as soon as its text is revealed
+            const seen = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+            localStorage.setItem(STORAGE_KEY, seen + 1);
           }
         },
       });
@@ -160,38 +155,33 @@ const Messages = (function () {
     }, loadingDuration - 50);
   };
 
-  const sendMessages = function () {
+  const _sendMessages = function () {
     const message = _messages[_messageIndex];
     if (!message) return;
-
-    // Persist after the last message starts so return visits skip the animation
-    if (_messageIndex === _messages.length - 1) {
-      localStorage.setItem(STORAGE_KEY, '1');
-    }
-
     _prepareMessage(message);
     ++_messageIndex;
     setTimeout(
-      sendMessages,
+      _sendMessages,
       message.replace(/<(?:.|\n)*?>/gm, '').length * _typingSpeed +
         gsap.utils.random(1500, 2500)
     );
   };
 
-  // Render all messages immediately for return visits with a staggered fade-in
-  const renderAll = function () {
-    const bubbles = _messages.map(function (message, i) {
+  // Render already-seen bubbles immediately then continue the animation
+  const _renderSeen = function (count) {
+    const isComplete = count >= _messages.length;
+    const bubbles = _messages.slice(0, count).map(function (message, i) {
       const bubbleEl = document.createElement('div');
       const messageEl = document.createElement('span');
 
       bubbleEl.classList.add('bubble', 'left');
-      if (i === _messages.length - 1) bubbleEl.classList.add('cornered');
+      if (isComplete && i === count - 1) bubbleEl.classList.add('cornered');
       messageEl.classList.add('message');
       messageEl.innerHTML = message;
       bubbleEl.appendChild(messageEl);
 
-      gsap.set(bubbleEl, { opacity: 0 });
-      gsap.set(messageEl, { opacity: 1 });
+      bubbleEl.style.opacity = '0';
+      messageEl.style.opacity = '1';
 
       _messagesEl.appendChild(bubbleEl);
       _messagesEl.appendChild(document.createElement('br'));
@@ -199,13 +189,22 @@ const Messages = (function () {
       return bubbleEl;
     });
 
-    gsap.to(bubbles, {
-      opacity: 1,
-      duration: 0.4,
-      stagger: 0.08,
-      ease: 'power2.out',
-    });
+    gsap.to(bubbles, { opacity: 1, duration: 0.4, stagger: 0.08, ease: 'power2.out' });
   };
 
-  return { send: sendMessages, render: renderAll };
+  const init = function () {
+    const seenCount = Math.min(
+      parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10),
+      _messages.length
+    );
+
+    if (seenCount > 0) _renderSeen(seenCount);
+
+    if (seenCount < _messages.length) {
+      _messageIndex = seenCount;
+      _sendMessages();
+    }
+  };
+
+  return { init };
 })();
