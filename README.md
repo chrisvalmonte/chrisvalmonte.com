@@ -2,9 +2,9 @@
 
 ### About
 
-Personal introduction website
+Personal introduction website built with a text message-style UI. Animations rewritten using [GSAP](https://gsap.com).
 
-Based off of Julian Garnier's original project, juliangarnier.com. The code from the original project was forked and modified here by Chris Valmonte.
+Originally based on Julian Garnier's [juliangarnier.com](https://juliangarnier.com). Modified and rewritten by Chris Valmonte.
 
 ### License and Copyright
 
