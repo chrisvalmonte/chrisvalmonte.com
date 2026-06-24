@@ -180,16 +180,11 @@ const Messages = (function () {
       messageEl.innerHTML = message;
       bubbleEl.appendChild(messageEl);
 
-      bubbleEl.style.opacity = '0';
       messageEl.style.opacity = '1';
 
       _messagesEl.appendChild(bubbleEl);
       _messagesEl.appendChild(document.createElement('br'));
-
-      return bubbleEl;
     });
-
-    gsap.to(bubbles, { opacity: 1, duration: 0.4, stagger: 0.08, ease: 'power2.out' });
   };
 
   const init = function () {
