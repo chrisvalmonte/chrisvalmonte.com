@@ -1,8 +1,14 @@
+const STORAGE_KEY = 'cv_messages_seen';
+
 window.onload = function () {
   const fab = document.querySelector('.fab > a');
   gsap.to(fab, { scale: 1, duration: 0.5, ease: 'power1.out' });
 
-  Messages.send();
+  if (localStorage.getItem(STORAGE_KEY)) {
+    Messages.render();
+  } else {
+    Messages.send();
+  }
 };
 
 const Messages = (function () {
@@ -90,7 +96,7 @@ const Messages = (function () {
     gsap.set(elements.bubble, { width: '0rem', height: dimensions.loading.h, opacity: 1 });
     gsap.set(elements.message, { width: dimensions.message.w, height: dimensions.message.h });
 
-    // Entrance: bubble pops in to loading size (easeOutElastic equivalent)
+    // Entrance: bubble pops in to loading size
     const bubbleSizeTween = gsap.fromTo(
       elements.bubble,
       { width: '0rem', marginTop: '2.5rem', marginLeft: '-2.5rem' },
@@ -122,7 +128,6 @@ const Messages = (function () {
       loadingLoop.pause();
       dotsTweens.forEach(t => t.kill());
 
-      // Fade dots out; at 65% progress reveal the message (mirrors anime update callback)
       gsap.to(dots, {
         opacity: 0,
         scale: 0,
@@ -135,7 +140,6 @@ const Messages = (function () {
         },
       });
 
-      // Expand bubble from loading size to message size
       bubbleSizeTween.kill();
       gsap.fromTo(
         elements.bubble,
@@ -159,6 +163,12 @@ const Messages = (function () {
   const sendMessages = function () {
     const message = _messages[_messageIndex];
     if (!message) return;
+
+    // Persist after the last message starts so return visits skip the animation
+    if (_messageIndex === _messages.length - 1) {
+      localStorage.setItem(STORAGE_KEY, '1');
+    }
+
     _prepareMessage(message);
     ++_messageIndex;
     setTimeout(
@@ -168,5 +178,34 @@ const Messages = (function () {
     );
   };
 
-  return { send: sendMessages };
+  // Render all messages immediately for return visits with a staggered fade-in
+  const renderAll = function () {
+    const bubbles = _messages.map(function (message, i) {
+      const bubbleEl = document.createElement('div');
+      const messageEl = document.createElement('span');
+
+      bubbleEl.classList.add('bubble', 'left');
+      if (i === _messages.length - 1) bubbleEl.classList.add('cornered');
+      messageEl.classList.add('message');
+      messageEl.innerHTML = message;
+      bubbleEl.appendChild(messageEl);
+
+      gsap.set(bubbleEl, { opacity: 0 });
+      gsap.set(messageEl, { opacity: 1 });
+
+      _messagesEl.appendChild(bubbleEl);
+      _messagesEl.appendChild(document.createElement('br'));
+
+      return bubbleEl;
+    });
+
+    gsap.to(bubbles, {
+      opacity: 1,
+      duration: 0.4,
+      stagger: 0.08,
+      ease: 'power2.out',
+    });
+  };
+
+  return { send: sendMessages, render: renderAll };
 })();
