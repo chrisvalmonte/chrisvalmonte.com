@@ -4,8 +4,8 @@
     <title>corner</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.5">
-        <g id="corner" fill="#CFCFCF">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="1">
+        <g id="corner" fill="#3A3A3C">
             <path d="M8,0 L8,8 L0,8 C4.418278,8 8,4.418278 8,0 L8,0 Z"></path>
         </g>
     </g>

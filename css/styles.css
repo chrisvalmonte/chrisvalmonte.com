@@ -14,7 +14,8 @@ body {
   min-width: 100vw;
   min-height: 100vh;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: #FFF;
+  background: #000;
+  color: #FFF;
 }
 .messages {
   overflow: auto;
@@ -37,7 +38,7 @@ body {
   border-bottom-left-radius: 0;
 }
 .bubble.left {
-  background: rgba(206,206,206,0.50);
+  background: #3A3A3C;
 }
 .bubble:after {
   content: "";
@@ -62,7 +63,7 @@ body {
   opacity: 0;
 }
 .bubble a {
-  color: #0076FF;
+  color: #0A84FF;
 }
 .bubble .loading {
   position: absolute;
@@ -72,7 +73,7 @@ body {
 }
 .bubble .loading b {
   display: inline-block;
-  color: rgba(0,0,0,.5);
+  color: rgba(255,255,255,.5);
 }
 .fab {
   bottom: 30px;
