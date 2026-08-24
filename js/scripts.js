@@ -16,7 +16,7 @@ const Messages = (function () {
     'Hey 👋',
     "I'm Christopher",
     'I build experiences on the web',
-    '<a href="https://behance.net/chrisvalmonte" rel="noopener noreferrer" target="_blank">behance.net/chrisvalmonte</a><br><a href="https://github.com/chrisvalmonte" rel="noopener noreferrer" target="_blank">github.com/chrisvalmonte</a>',
+    '<a href="https://linkedin.com/in/chrisvalmonte" rel="noopener noreferrer" target="_blank">linkedin.com/in/chrisvalmonte</a><br><a href="https://behance.net/chrisvalmonte" rel="noopener noreferrer" target="_blank">behance.net/chrisvalmonte</a>',
   ];
 
   const _getFontSize = function () {
