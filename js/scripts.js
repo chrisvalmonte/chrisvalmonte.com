@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'cv_messages_seen';
+const STORAGE_KEY = 'cv_messages_seen_v2';
 
 window.onload = function () {
   const fab = document.querySelector('.fab > a');
@@ -14,9 +14,8 @@ const Messages = (function () {
 
   const _messages = [
     'Hey 👋',
-    "I'm Christopher",
-    'I build experiences on the web',
-    '<a href="https://linkedin.com/in/chrisvalmonte" rel="noopener noreferrer" target="_blank">linkedin.com/in/chrisvalmonte</a><br><a href="https://youtu.be/CNY_cEXMnwE" rel="noopener noreferrer" target="_blank">youtu.be/CNY_cEXMnwE</a>',
+    'Check out my work',
+    '<a href="https://youtu.be/CNY_cEXMnwE" rel="noopener noreferrer" target="_blank">youtu.be/CNY_cEXMnwE</a>',
   ];
 
   const _getFontSize = function () {
