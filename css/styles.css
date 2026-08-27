@@ -19,6 +19,17 @@ body {
 .screen {
   display: contents;
 }
+/* Off-screen but still read aloud: keeps the <h1> out of the visual design
+   without hiding it from assistive tech the way display/visibility would. */
+.visually-hidden {
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .messages {
   overflow: auto;
   width: 100vw;
@@ -98,6 +109,12 @@ body {
 }
 .fab > a > i {
   font-size: 1.5rem;
+}
+/* Keyboard-only focus ring. White reads clearly on every background a link
+   sits on here: the green FAB, the grey bubbles and the black screen. */
+a:focus-visible {
+  outline: .125rem solid #FFF;
+  outline-offset: .125rem;
 }
 
 @media (min-width: 900px) {
