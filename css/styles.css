@@ -105,7 +105,7 @@ body {
   body {
     justify-content: center;
     padding: 1.5rem 0;
-    background: radial-gradient(ellipse at 50% 35%, #F4F4F5 0%, #E4E4E7 70%, #D9D9DD 100%);
+    background: radial-gradient(ellipse at 50% 35%, #005A00 0%, #004B00 70%, #003C00 100%);
   }
   .device {
     position: relative;
