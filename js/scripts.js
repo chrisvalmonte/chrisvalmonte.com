@@ -65,7 +65,22 @@ const Messages = (function () {
     bubbleEl.classList.add(position === 'right' ? 'right' : 'left');
     messageEl.classList.add('message');
     loadingEl.classList.add('loading');
+    // The dots are pure animation, so they are kept out of the accessibility
+    // tree — otherwise the live region announces "bullet bullet bullet" once
+    // for every message that gets typed out.
+    loadingEl.setAttribute('aria-hidden', 'true');
+    // The text is in the DOM, at full size, well before it is revealed. A live
+    // region announces content when it is inserted rather than when it becomes
+    // visible, so the message stays hidden through the loading state and is
+    // exposed at the moment it fades in.
+    messageEl.setAttribute('aria-hidden', 'true');
     messageEl.innerHTML = message;
+    // A link inside a hidden subtree is still reachable by Tab, which is its
+    // own violation, so any link is taken out of the tab order for as long as
+    // the message is hidden.
+    Array.from(messageEl.querySelectorAll('a')).forEach(function (link) {
+      link.setAttribute('tabindex', '-1');
+    });
     loadingEl.innerHTML = _loadingText;
     bubbleEl.appendChild(loadingEl);
     bubbleEl.appendChild(messageEl);
@@ -99,7 +114,11 @@ const Messages = (function () {
       message.replace(/<(?:.|\n)*?>/gm, '').length * _typingSpeed + 500;
     const elements = _createBubbleElements(message, position);
     _messagesEl.appendChild(elements.bubble);
-    _messagesEl.appendChild(document.createElement('br'));
+    // The break is only there to space the bubbles apart, so it is hidden
+    // rather than read out as part of the conversation.
+    const spacerEl = document.createElement('br');
+    spacerEl.setAttribute('aria-hidden', 'true');
+    _messagesEl.appendChild(spacerEl);
     const dimensions = _getDimensions(elements);
 
     gsap.set(elements.bubble, { width: '0rem', height: dimensions.loading.h, opacity: 1 });
@@ -141,6 +160,13 @@ const Messages = (function () {
         onUpdate: function () {
           if (this.progress() >= 0.65 && elements.bubble.classList.contains('is-loading')) {
             elements.bubble.classList.remove('is-loading');
+            // Now that the bubble has finished typing, hand the text to the
+            // live region. The `is-loading` check above means this runs once
+            // per bubble, so the message is announced exactly once.
+            elements.message.removeAttribute('aria-hidden');
+            Array.from(elements.message.querySelectorAll('a')).forEach(function (link) {
+              link.removeAttribute('tabindex');
+            });
             gsap.to(elements.message, { opacity: 1, duration: 0.45 });
 
             if (_onFirstMessage) {
@@ -204,7 +230,12 @@ const Messages = (function () {
       messageEl.style.opacity = '1';
 
       _messagesEl.appendChild(bubbleEl);
-      _messagesEl.appendChild(document.createElement('br'));
+      // These bubbles are painted before the live region matters and are
+      // visible straight away, so the text is left readable and only the
+      // spacer is hidden — the same end state the animated path settles into.
+      const spacerEl = document.createElement('br');
+      spacerEl.setAttribute('aria-hidden', 'true');
+      _messagesEl.appendChild(spacerEl);
     });
   };
 

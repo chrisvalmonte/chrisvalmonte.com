@@ -20,10 +20,7 @@
 
     <title>Chris Valmonte</title>
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
       content="Web engineer with 10 years leading platform, performance, and reliability at scale."
@@ -50,7 +47,7 @@
       rel="stylesheet"
       type="text/css"
       media="screen"
-      href="css/styles.css?v=4"
+      href="css/styles.css?v=5"
     />
     <link
       href="https://use.fontawesome.com/releases/v5.0.2/css/all.css"
@@ -58,23 +55,31 @@
     />
   </head>
   <body>
-    <div class="device">
+    <main class="device">
+      <h1 class="visually-hidden">Chris Valmonte</h1>
+
       <div class="screen">
-        <div class="messages"></div>
+        <div
+          class="messages"
+          role="log"
+          aria-live="polite"
+          aria-atomic="false"
+          aria-label="Conversation"
+        ></div>
 
         <div class="fab">
           <a
             href="mailto:hello@chrisvalmonte.com"
             aria-label="Email Chris Valmonte"
           >
-            <i class="fas fa-reply"></i>
+            <i class="fas fa-reply" aria-hidden="true" focusable="false"></i>
           </a>
         </div>
       </div>
-    </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-    <script src="js/scripts.js?v=5"></script>
+    <script src="js/scripts.js?v=6"></script>
   </body>
 </html>
