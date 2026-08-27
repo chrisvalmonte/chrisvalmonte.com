@@ -19,7 +19,10 @@ const Messages = (function () {
   ];
 
   const _getFontSize = function () {
-    return parseInt(getComputedStyle(document.body).getPropertyValue('font-size'));
+    // parseFloat, not parseInt: the root font-size is fractional at desktop
+    // (it scales with viewport height), and truncating it inflates every
+    // measurement converted through _pxToRem.
+    return parseFloat(getComputedStyle(document.body).getPropertyValue('font-size'));
   };
 
   const _pxToRem = function (px) {
@@ -46,15 +49,21 @@ const Messages = (function () {
     return { bubble: bubbleEl, message: messageEl, loading: loadingEl };
   };
 
+  // 1px guard against sub-pixel rounding wrapping the text; any more than
+  // that shows up as lopsided padding on the right edge of the bubble.
+  const _naturalWidth = function (el) {
+    return el.getBoundingClientRect().width + 1;
+  };
+
   const _getDimensions = function (elements) {
     return {
       loading: { w: '4rem', h: '2.25rem' },
       bubble: {
-        w: _pxToRem(elements.bubble.offsetWidth + 4),
+        w: _pxToRem(_naturalWidth(elements.bubble)),
         h: _pxToRem(elements.bubble.offsetHeight),
       },
       message: {
-        w: _pxToRem(elements.message.offsetWidth + 4),
+        w: _pxToRem(_naturalWidth(elements.message)),
         h: _pxToRem(elements.message.offsetHeight),
       },
     };

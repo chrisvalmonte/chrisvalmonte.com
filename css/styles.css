@@ -1,7 +1,5 @@
 :root { font-size: 1.125rem; }
 @media (min-width: 600px) { :root { font-size: 1.5rem; } }
-@media (min-width: 900px) { :root { font-size: 1.75rem; } }
-@media (min-width: 1200px) { :root { font-size: 2rem; } }
 *, *:before, *:after {
   margin: 0;
   padding: 0;
@@ -11,11 +9,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 100vw;
+  min-width: 100%;
   min-height: 100vh;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: #000;
   color: #FFF;
+}
+.device,
+.screen {
+  display: contents;
 }
 .messages {
   overflow: auto;
@@ -25,6 +27,7 @@ body {
 }
 .bubble {
   overflow: hidden;
+  position: relative;
   display: inline-block;
   margin: 0 0 .125rem 0;
   padding: .5rem .85rem;
@@ -95,4 +98,88 @@ body {
 }
 .fab > a > i {
   font-size: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  :root { font-size: min(1.125rem, 2.05dvh); }
+  body {
+    justify-content: center;
+    padding: 1.5rem 0;
+    background: radial-gradient(ellipse at 50% 35%, #F4F4F5 0%, #E4E4E7 70%, #D9D9DD 100%);
+  }
+  .device {
+    position: relative;
+    display: block;
+    flex: none;
+    aspect-ratio: 390 / 844;
+    height: 100vh;
+    height: min(844px, calc(100dvh - 3rem));
+    padding: .4rem;
+    border-radius: 3.1rem;
+    background: linear-gradient(90deg, #8A8A90 0%, #3A3A3D 6%, #58585C 50%, #353538 94%, #8F8F95 100%);
+    box-shadow:
+      0 30px 60px rgba(0,0,0,.3),
+      0 6px 16px rgba(0,0,0,.18),
+      inset 0 0 0 1px rgba(255,255,255,.25);
+  }
+  .device:before,
+  .device:after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    border-radius: 1px;
+    background: #8A8A90;
+  }
+  .device:before {
+    top: 6.5rem;
+    left: -1px;
+    height: 1.5rem;
+    box-shadow:
+      0 2.75rem 0 #8A8A90,
+      0 5rem 0 #8A8A90;
+  }
+  .device:after {
+    top: 8.5rem;
+    right: -1px;
+    height: 3.75rem;
+  }
+  .screen {
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border-radius: 2.7rem;
+    background: #000;
+  }
+  .screen:before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    top: .55rem;
+    left: 50%;
+    width: 6.2rem;
+    height: 1.85rem;
+    border-radius: 1rem;
+    background: #0B0B0C;
+    box-shadow: inset -1.6rem 0 0 -1.35rem #1C1C1E;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .messages {
+    flex: 1 1 auto;
+    width: 100%;
+    max-height: none;
+    padding-top: 3rem;
+    scrollbar-width: none;
+  }
+  .messages::-webkit-scrollbar {
+    display: none;
+  }
+  .fab {
+    position: absolute;
+    right: 1.1rem;
+    bottom: 1.6rem;
+  }
 }
