@@ -91,6 +91,115 @@ function readFrame() {
   };
 }
 
+// Installed before the page's own scripts so it can stamp the first frame at
+// which each entrance milestone becomes true.
+function recordEntrance() {
+  const marks = { start: performance.now() };
+  const seen = (name) => { if (marks[name] === undefined) marks[name] = performance.now(); };
+  const sample = () => {
+    const device = document.querySelector('.device');
+    if (device) {
+      const mobile = getComputedStyle(device).display === 'contents';
+      if (marks.initialTransform === undefined) {
+        marks.initialTransform = getComputedStyle(device).transform;
+      }
+      // At rest means the transform has settled at identity. Testing merely
+      // for "inside the viewport" fires partway through the slide.
+      const ty = (getComputedStyle(device).transform.match(/matrix\(.*,\s*([-\d.]+)\)$/) || [])[1];
+      if (mobile || ty === undefined || Math.abs(parseFloat(ty)) < 0.5) {
+        seen('deviceAtRest');
+      }
+    }
+    const fab = document.querySelector('.fab > a');
+    // The FAB rests at scale(0); any other matrix means it has started to pop.
+    if (fab && !/matrix\(0,\s*0,\s*0,\s*0/.test(getComputedStyle(fab).transform)) {
+      seen('fabVisible');
+    }
+    if (document.querySelector('.bubble')) seen('firstBubble');
+    // Text revealed, not merely the loading pill on screen.
+    if (document.querySelector('.bubble:not(.is-loading)')) seen('firstBubbleSent');
+    requestAnimationFrame(sample);
+  };
+  requestAnimationFrame(sample);
+  window.__entrance = marks;
+}
+
+async function waitForDeviceAtRest(page) {
+  await page.waitForFunction(() => {
+    const el = document.querySelector('.device');
+    if (!el) return false;
+    const style = getComputedStyle(el);
+    if (style.display === 'contents') return true;                  // mobile: no frame
+    if (style.transform === 'none') return true;
+    const ty = (style.transform.match(/matrix\(.*,\s*([-\d.]+)\)$/) || [])[1];
+    return ty !== undefined && Math.abs(parseFloat(ty)) < 0.5;
+  }, { timeout: 15000 });
+}
+
+// `persisted` = the visitor has seen these bubbles before, so they are painted
+// synchronously ahead of the entrance rather than animating in after it.
+async function assertEntranceOrder(page, { desktop, persisted }) {
+  const label = `${desktop ? 'desktop' : 'mobile'}, ${persisted ? 'return visit' : 'first visit'}`;
+  console.log(`\n── Entrance sequence (${label}) ──────────────────────`);
+  await page.waitForFunction(() => {
+    const marks = window.__entrance;
+    return marks && marks.fabVisible !== undefined && marks.firstBubbleSent !== undefined;
+  }, { timeout: 20000 });
+  const m = await page.evaluate(() => window.__entrance);
+
+  assert(m.fabVisible !== undefined, 'Reply button becomes visible');
+  assert(m.firstBubbleSent !== undefined, 'First message is delivered');
+
+  if (!desktop) {
+    // Below 900px there is no device box to move, so the slide must not exist.
+    assert(
+      m.initialTransform === 'none',
+      `Phone frame has no transform below 900px (${m.initialTransform})`
+    );
+  } else {
+    assert(m.deviceAtRest !== undefined, 'Device reaches its resting position');
+    assert(
+      /matrix\(1,\s*0,\s*0,\s*1,\s*0,\s*([1-9]\d*)/.test(m.initialTransform),
+      `Phone starts translated below the fold (${m.initialTransform})`
+    );
+
+    const slide = m.deviceAtRest - m.start;
+    assert(slide > 200 && slide < 5000, `Slide runs for a visible beat (${slide.toFixed(0)}ms)`);
+
+    assert(
+      m.deviceAtRest <= m.fabVisible + 1,
+      `Phone lands before the reply button appears (${(m.fabVisible - m.deviceAtRest).toFixed(0)}ms apart)`
+    );
+
+    if (persisted) {
+      // The point of splitting Messages.init() from Messages.start(): a
+      // returning visitor's phone rises with the conversation already on it.
+      assert(
+        m.firstBubbleSent <= m.deviceAtRest + 1,
+        `Seen bubbles are on screen before the phone lands (${(m.deviceAtRest - m.firstBubbleSent).toFixed(0)}ms earlier)`
+      );
+    } else {
+      assert(
+        m.deviceAtRest <= m.firstBubble + 1,
+        `Phone lands before the first bubble starts (${(m.firstBubble - m.deviceAtRest).toFixed(0)}ms apart)`
+      );
+    }
+  }
+
+  // The button trails the conversation rather than leading it.
+  assert(
+    m.firstBubbleSent <= m.fabVisible + 1,
+    `Reply button follows the first message (${(m.fabVisible - m.firstBubbleSent).toFixed(0)}ms after)`
+  );
+
+  if (!persisted) {
+    assert(
+      m.firstBubble < m.fabVisible,
+      `Bubble is on screen before the button (${(m.fabVisible - m.firstBubble).toFixed(0)}ms apart)`
+    );
+  }
+}
+
 async function assertDesktopFrame(page) {
   console.log('\n── Desktop phone mockup ───────────────────────────────────');
   const f = await page.evaluate(readFrame);
@@ -215,6 +324,7 @@ async function assertMobileFullBleed(page) {
   console.log(`\nOpening ${url}`);
   const p1 = await browser.newPage();
   await p1.setViewport(DESKTOP);
+  await p1.evaluateOnNewDocument(recordEntrance);
   await p1.goto(url, { waitUntil: 'networkidle0' });
 
   console.log('\n── Loading state (first visit) ───────────────────────────────');
@@ -246,8 +356,10 @@ async function assertMobileFullBleed(page) {
   const hrefs = await p1.$$eval('.bubble .message a', els => els.map(el => el.getAttribute('href')));
   assert(hrefs.includes('https://youtu.be/CNY_cEXMnwE'), 'YouTube link present');
 
+  await waitForDeviceAtRest(p1);
   await assertDesktopFrame(p1);
   await assertBubblePadding(p1, 'first visit, animated');
+  await assertEntranceOrder(p1, { desktop: true, persisted: false });
 
   await p1.screenshot({ path: path.join(__dirname, 'screenshots/first-visit.png') });
 
@@ -255,6 +367,7 @@ async function assertMobileFullBleed(page) {
   const p2 = await browser.newPage();
   await p2.setViewport(DESKTOP);
   await p2.evaluateOnNewDocument((key) => localStorage.setItem(key, '2'), STORAGE_KEY);
+  await p2.evaluateOnNewDocument(recordEntrance);
   await p2.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 600));
 
@@ -275,6 +388,7 @@ async function assertMobileFullBleed(page) {
   const p3 = await browser.newPage();
   await p3.setViewport(DESKTOP);
   await p3.evaluateOnNewDocument((key, n) => localStorage.setItem(key, String(n)), STORAGE_KEY, MESSAGE_COUNT);
+  await p3.evaluateOnNewDocument(recordEntrance);
   await p3.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 800));
 
@@ -282,19 +396,23 @@ async function assertMobileFullBleed(page) {
   const loadingOnReturn = await p3.$$eval('.bubble.is-loading', els => els.length);
   assert(loadingOnReturn === 0, 'No loading dots on full return visit');
   await assertMessages(p3, MESSAGE_COUNT, 'Full return visit — all messages');
+  await waitForDeviceAtRest(p3);
   await assertDesktopFrame(p3);
+  await assertEntranceOrder(p3, { desktop: true, persisted: true });
   await p3.screenshot({ path: path.join(__dirname, 'screenshots/return-visit.png') });
 
   // ── Short desktop viewport: the frame scales instead of clipping ────────
   const p4 = await browser.newPage();
   await p4.setViewport({ width: 1440, height: 700 });
   await p4.evaluateOnNewDocument((key, n) => localStorage.setItem(key, String(n)), STORAGE_KEY, MESSAGE_COUNT);
+  await p4.evaluateOnNewDocument(recordEntrance);
   await p4.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 800));
 
   console.log('\n── Short desktop viewport (1440×700) ──────────────────────');
   const shortFrame = await p4.evaluate(readFrame);
   assert(shortFrame.device.h < 844, `Device scales down to fit (${shortFrame.device.h.toFixed(0)}px tall)`);
+  await waitForDeviceAtRest(p4);
   await assertDesktopFrame(p4);
   await p4.screenshot({ path: path.join(__dirname, 'screenshots/short-viewport.png') });
 
@@ -302,11 +420,13 @@ async function assertMobileFullBleed(page) {
   const p5 = await browser.newPage();
   await p5.setViewport(MOBILE);
   await p5.evaluateOnNewDocument((key, n) => localStorage.setItem(key, String(n)), STORAGE_KEY, MESSAGE_COUNT);
+  await p5.evaluateOnNewDocument(recordEntrance);
   await p5.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 800));
 
   await assertMobileFullBleed(p5);
   await assertBubblePadding(p5, 'mobile');
+  await assertEntranceOrder(p5, { desktop: false, persisted: true });
   await assertMessages(p5, MESSAGE_COUNT, 'Mobile — all messages');
   await p5.screenshot({ path: path.join(__dirname, 'screenshots/mobile.png') });
 

@@ -116,6 +116,11 @@ body {
     height: min(844px, calc(100dvh - 3rem));
     padding: .4rem;
     border-radius: 3.1rem;
+    /* Starting position for the entrance: shifted down so the top 60% of the
+       phone is visible on load and the rest rises into place. GSAP tweens this
+       to 0. Declared here rather than in JS so the phone never paints at rest
+       first and then jumps down. */
+    transform: translateY(40%);
     background: linear-gradient(90deg, #8A8A90 0%, #3A3A3D 6%, #58585C 50%, #353538 94%, #8F8F95 100%);
     box-shadow:
       0 30px 60px rgba(0,0,0,.3),
