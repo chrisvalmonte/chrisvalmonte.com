@@ -107,8 +107,16 @@ body {
   transform: scale(0);
   width: 3.5rem;
 }
-.fab > a > i {
-  font-size: 1.5rem;
+/* The icon is an inline SVG rather than an icon-font glyph. 1.5rem square is
+   the em box the old 1.5rem glyph filled, so the button reads at the same
+   size, and `display: block` takes the SVG off the inline baseline — as a
+   replaced element it would otherwise sit high in the circle that the flex
+   centering on `.fab > a` puts it in. Its `currentColor` fill resolves to the
+   anchor's own color. */
+.fab-icon {
+  display: block;
+  height: 1.5rem;
+  width: 1.5rem;
 }
 /* Keyboard-only focus ring. White reads clearly on every background a link
    sits on here: the green FAB, the grey bubbles and the black screen. */
