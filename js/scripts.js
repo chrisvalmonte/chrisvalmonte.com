@@ -1,6 +1,9 @@
 const STORAGE_KEY = 'cv_messages_seen_v2';
 
-window.onload = function () {
+// The entrance needs the parsed DOM and GSAP, and nothing else. Waiting on
+// `load` would also wait on the async analytics bundle, holding the first
+// message back by a few hundred milliseconds for bytes it never touches.
+const beginEntrance = function () {
   const fab = document.querySelector('.fab > a');
   // Must stay in sync with the device-frame breakpoint in styles.css.
   const isDesktop = window.matchMedia('(min-width: 900px)').matches;
@@ -50,8 +53,12 @@ const Messages = (function () {
     return parseFloat(getComputedStyle(document.body).getPropertyValue('font-size'));
   };
 
-  const _pxToRem = function (px) {
-    return px / _getFontSize() + 'rem';
+  // The font size is handed in rather than looked up here. This runs four
+  // times for every bubble, and resolving the body's computed style on each
+  // conversion re-read a value that cannot change in the middle of a single
+  // measurement pass.
+  const _pxToRem = function (px, fontSize) {
+    return px / fontSize + 'rem';
   };
 
   const _createBubbleElements = function (message, position) {
@@ -78,7 +85,7 @@ const Messages = (function () {
     // A link inside a hidden subtree is still reachable by Tab, which is its
     // own violation, so any link is taken out of the tab order for as long as
     // the message is hidden.
-    Array.from(messageEl.querySelectorAll('a')).forEach(function (link) {
+    messageEl.querySelectorAll('a').forEach(function (link) {
       link.setAttribute('tabindex', '-1');
     });
     loadingEl.innerHTML = _loadingText;
@@ -96,15 +103,33 @@ const Messages = (function () {
   };
 
   const _getDimensions = function (elements) {
+    // Reads and writes are kept apart on purpose: the bubble has just been put
+    // into the document, so the first measurement forces a synchronous layout
+    // and every later one forces another if a style lookup has intervened.
+    // Taking the root font size and all four geometry values back to back lets
+    // the browser lay the page out once per bubble.
+    //
+    // The font size is cached for this pass only. Nothing between these lines
+    // yields to the event loop, so a resize cannot land part-way through and
+    // leave half the conversions on a stale value — which is also why it is
+    // not hoisted to the module, where seconds pass between bubbles. The
+    // measurements are byte-for-byte the ones the per-conversion lookups
+    // produced.
+    const fontSize = _getFontSize();
+    const bubbleWidth = _naturalWidth(elements.bubble);
+    const bubbleHeight = elements.bubble.offsetHeight;
+    const messageWidth = _naturalWidth(elements.message);
+    const messageHeight = elements.message.offsetHeight;
+
     return {
       loading: { w: '4rem', h: '2.25rem' },
       bubble: {
-        w: _pxToRem(_naturalWidth(elements.bubble)),
-        h: _pxToRem(elements.bubble.offsetHeight),
+        w: _pxToRem(bubbleWidth, fontSize),
+        h: _pxToRem(bubbleHeight, fontSize),
       },
       message: {
-        w: _pxToRem(_naturalWidth(elements.message)),
-        h: _pxToRem(elements.message.offsetHeight),
+        w: _pxToRem(messageWidth, fontSize),
+        h: _pxToRem(messageHeight, fontSize),
       },
     };
   };
@@ -164,7 +189,7 @@ const Messages = (function () {
             // live region. The `is-loading` check above means this runs once
             // per bubble, so the message is announced exactly once.
             elements.message.removeAttribute('aria-hidden');
-            Array.from(elements.message.querySelectorAll('a')).forEach(function (link) {
+            elements.message.querySelectorAll('a').forEach(function (link) {
               link.removeAttribute('tabindex');
             });
             gsap.to(elements.message, { opacity: 1, duration: 0.45 });
@@ -217,7 +242,12 @@ const Messages = (function () {
   // Render already-seen bubbles immediately then continue the animation
   const _renderSeen = function (count) {
     const isComplete = count >= _messages.length;
-    const bubbles = _messages.slice(0, count).map(function (message, i) {
+    // This runs synchronously on the critical path of a return visit, before
+    // anything has painted, so the bubbles are assembled off-document and put
+    // in with a single insertion rather than two per message.
+    const fragment = document.createDocumentFragment();
+
+    _messages.slice(0, count).forEach(function (message, i) {
       const bubbleEl = document.createElement('div');
       const messageEl = document.createElement('span');
 
@@ -229,14 +259,16 @@ const Messages = (function () {
 
       messageEl.style.opacity = '1';
 
-      _messagesEl.appendChild(bubbleEl);
+      fragment.appendChild(bubbleEl);
       // These bubbles are painted before the live region matters and are
       // visible straight away, so the text is left readable and only the
       // spacer is hidden — the same end state the animated path settles into.
       const spacerEl = document.createElement('br');
       spacerEl.setAttribute('aria-hidden', 'true');
-      _messagesEl.appendChild(spacerEl);
+      fragment.appendChild(spacerEl);
     });
+
+    _messagesEl.appendChild(fragment);
   };
 
   // Paint what the visitor has already seen. Split from `start` so the caller
@@ -263,3 +295,12 @@ const Messages = (function () {
 
   return { init, start };
 })();
+
+// Dispatched from the foot of the file so `Messages` is initialised either way:
+// this script is a classic one at the end of <body>, so the document is still
+// parsing, but the readyState check keeps it correct if that ever changes.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', beginEntrance);
+} else {
+  beginEntrance();
+}
