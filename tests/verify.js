@@ -12,10 +12,16 @@ const MIME = {
   '.png': 'image/png',
 };
 
+const STORAGE_KEY = 'cv_messages_seen_v2';
+const DESKTOP = { width: 1280, height: 800 };
+const MOBILE = { width: 390, height: 844 };
+
 function createServer() {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
-      let filePath = path.join(ROOT, req.url === '/' ? 'index.html' : req.url);
+      // Strip ?v= cache-busting keys before resolving on disk.
+      const urlPath = req.url.split('?')[0];
+      let filePath = path.join(ROOT, urlPath === '/' ? 'index.html' : urlPath);
       const ext = path.extname(filePath);
       fs.readFile(filePath, (err, data) => {
         if (err) { res.writeHead(404); res.end('Not found'); return; }
@@ -37,10 +43,10 @@ function assert(condition, label) {
 
 const ALL_TEXTS = [
   t => t === 'Hey 👋',
-  t => t === "I'm Christopher",
-  t => t === 'I build experiences on the web',
-  t => t.includes('behance.net/chrisvalmonte') && t.includes('github.com/chrisvalmonte'),
+  t => t === 'Check out my work',
+  t => t.includes('youtu.be/CNY_cEXMnwE'),
 ];
+const MESSAGE_COUNT = ALL_TEXTS.length;
 
 async function assertMessages(page, expectedCount, label) {
   console.log(`\n── ${label} ──────────────────────────────────────────`);
@@ -54,6 +60,149 @@ async function assertMessages(page, expectedCount, label) {
   assert(stillLoading === 0, `No bubbles stuck in loading (got ${stillLoading})`);
 }
 
+// Geometry of the desktop phone mockup, measured from the live layout.
+function readFrame() {
+  const device = document.querySelector('.device');
+  const screen = document.querySelector('.screen');
+  const fab = document.querySelector('.fab');
+  const messages = document.querySelector('.messages');
+  const d = device.getBoundingClientRect();
+  const s = screen.getBoundingClientRect();
+  const f = fab.getBoundingClientRect();
+  const m = messages.getBoundingClientRect();
+  return {
+    device: { w: d.width, h: d.height, top: d.top, left: d.left, right: d.right, bottom: d.bottom },
+    screen: { w: s.width, h: s.height, top: s.top, left: s.left, right: s.right, bottom: s.bottom },
+    fab: { top: f.top, left: f.left, right: f.right, bottom: f.bottom },
+    messages: { w: m.width, scrollW: messages.scrollWidth },
+    // Bezel thickness per side — the gap between the outer shell and the screen.
+    bezel: {
+      left: s.left - d.left,
+      right: d.right - s.right,
+      top: s.top - d.top,
+      bottom: d.bottom - s.bottom,
+    },
+    deviceDisplay: getComputedStyle(device).display,
+    screenDisplay: getComputedStyle(screen).display,
+    fabPosition: getComputedStyle(fab).position,
+    bodyOverflowsX: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    bodyOverflowsY: document.documentElement.scrollHeight > document.documentElement.clientHeight,
+    viewport: { w: window.innerWidth, h: window.innerHeight },
+  };
+}
+
+async function assertDesktopFrame(page) {
+  console.log('\n── Desktop phone mockup ───────────────────────────────────');
+  const f = await page.evaluate(readFrame);
+
+  assert(f.deviceDisplay === 'block', `.device is a real box at desktop (display: ${f.deviceDisplay})`);
+  assert(f.screenDisplay === 'flex', `.screen is a real box at desktop (display: ${f.screenDisplay})`);
+
+  const ratio = f.device.h / f.device.w;
+  const target = 844 / 390;
+  assert(
+    Math.abs(ratio - target) < 0.02,
+    `Device holds a phone aspect ratio (${ratio.toFixed(3)} vs ${target.toFixed(3)})`
+  );
+
+  // Bezels: thin, present on every side, and even all the way around.
+  const sides = ['left', 'right', 'top', 'bottom'];
+  const thicknesses = sides.map(side => f.bezel[side]);
+  const maxBezel = Math.max(...thicknesses);
+  const minBezel = Math.min(...thicknesses);
+
+  assert(minBezel > 2, `Bezel visible on all four sides (thinnest ${minBezel.toFixed(1)}px)`);
+  assert(maxBezel <= 10, `Bezel is thin in absolute terms (thickest ${maxBezel.toFixed(1)}px)`);
+  assert(
+    maxBezel - minBezel < 0.5,
+    `Bezel is even on all sides (spread ${(maxBezel - minBezel).toFixed(2)}px)`
+  );
+
+  // The real test of "thin": bezel relative to device width. 11px on a 390px
+  // shell was 2.8%; the mockup wants noticeably slimmer than that.
+  const bezelRatio = maxBezel / f.device.w;
+  assert(
+    bezelRatio < 0.025,
+    `Bezel under 2.5% of device width (${(bezelRatio * 100).toFixed(2)}%)`
+  );
+
+  // The device must fit the viewport rather than clip or force scrolling.
+  assert(f.device.top >= 0 && f.device.bottom <= f.viewport.h + 1, 'Device fits vertically in the viewport');
+  assert(!f.bodyOverflowsX, 'No horizontal page scroll');
+  assert(!f.bodyOverflowsY, 'No vertical page scroll');
+
+  // Chat content lives inside the screen, not the browser window.
+  assert(f.fabPosition === 'absolute', `Reply button is scoped to the screen (position: ${f.fabPosition})`);
+  assert(
+    f.fab.right <= f.screen.right && f.fab.bottom <= f.screen.bottom &&
+    f.fab.left >= f.screen.left && f.fab.top >= f.screen.top,
+    'Reply button sits inside the screen bounds'
+  );
+  assert(
+    f.messages.scrollW <= Math.ceil(f.messages.w),
+    `Messages do not overflow the screen horizontally (${f.messages.scrollW} <= ${Math.ceil(f.messages.w)})`
+  );
+
+  const bubbles = await page.evaluate(() => {
+    const s = document.querySelector('.screen').getBoundingClientRect();
+    return Array.from(document.querySelectorAll('.bubble')).map((el) => {
+      const b = el.getBoundingClientRect();
+      return b.left >= s.left && b.right <= s.right && b.top >= s.top && b.bottom <= s.bottom;
+    });
+  });
+  assert(bubbles.length > 0 && bubbles.every(Boolean), `All ${bubbles.length} bubbles render inside the screen`);
+}
+
+// Each bubble should hug its text evenly. The animation sets an explicit
+// width in rem, so any error in that measurement shows up as dead space on
+// the right edge — the left side is pinned by padding and can't drift.
+async function assertBubblePadding(page, label) {
+  console.log(`\n── Bubble padding (${label}) ──────────────────────────────`);
+  const bubbles = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll('.bubble')).map((el) => {
+      const message = el.querySelector('.message');
+      const b = el.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(message);
+      const t = range.getBoundingClientRect();
+      const cssPad = parseFloat(getComputedStyle(el).paddingRight);
+      return {
+        text: el.textContent.trim().slice(0, 24),
+        left: t.left - b.left,
+        right: b.right - t.right,
+        cssPad,
+      };
+    });
+  });
+
+  assert(bubbles.length > 0, `${bubbles.length} bubbles measured`);
+  bubbles.forEach((b) => {
+    const skew = b.right - b.left;
+    assert(
+      skew <= 2,
+      `"${b.text}" padding even (left ${b.left.toFixed(1)}px, right ${b.right.toFixed(1)}px, skew ${skew.toFixed(1)}px)`
+    );
+    assert(
+      Math.abs(b.left - b.cssPad) < 1,
+      `"${b.text}" left padding matches CSS (${b.left.toFixed(1)}px vs ${b.cssPad.toFixed(1)}px)`
+    );
+  });
+}
+
+async function assertMobileFullBleed(page) {
+  console.log('\n── Mobile stays full-bleed ────────────────────────────────');
+  const f = await page.evaluate(readFrame);
+
+  assert(f.deviceDisplay === 'contents', `.device is inert below 900px (display: ${f.deviceDisplay})`);
+  assert(f.screenDisplay === 'contents', `.screen is inert below 900px (display: ${f.screenDisplay})`);
+  assert(f.fabPosition === 'fixed', `Reply button stays viewport-fixed (position: ${f.fabPosition})`);
+  assert(
+    Math.abs(f.messages.w - f.viewport.w) < 1,
+    `Chat spans the full viewport width (${f.messages.w.toFixed(0)} vs ${f.viewport.w})`
+  );
+  assert(!f.bodyOverflowsX, 'No horizontal page scroll');
+}
+
 (async () => {
   const server = await createServer();
   const port = server.address().port;
@@ -65,7 +214,7 @@ async function assertMessages(page, expectedCount, label) {
   // ── First visit: full animation, each bubble persisted as it appears ────
   console.log(`\nOpening ${url}`);
   const p1 = await browser.newPage();
-  await p1.setViewport({ width: 1280, height: 800 });
+  await p1.setViewport(DESKTOP);
   await p1.goto(url, { waitUntil: 'networkidle0' });
 
   console.log('\n── Loading state (first visit) ───────────────────────────────');
@@ -74,62 +223,92 @@ async function assertMessages(page, expectedCount, label) {
 
   // Wait for first bubble to be revealed and check the count increments
   await p1.waitForFunction(
-    () => parseInt(localStorage.getItem('cv_messages_seen') || '0', 10) >= 1,
-    { timeout: 10000 }
+    (key) => parseInt(localStorage.getItem(key) || '0', 10) >= 1,
+    { timeout: 10000 },
+    STORAGE_KEY
   );
-  const countAfterFirst = await p1.evaluate(() => parseInt(localStorage.getItem('cv_messages_seen'), 10));
+  const countAfterFirst = await p1.evaluate((key) => parseInt(localStorage.getItem(key), 10), STORAGE_KEY);
   assert(countAfterFirst === 1, `localStorage count = 1 after first bubble revealed (got ${countAfterFirst})`);
 
-  // Wait for all 4 messages
-  console.log('\n── Waiting for all 4 messages (up to 35s)… ──────────────────');
+  console.log(`\n── Waiting for all ${MESSAGE_COUNT} messages (up to 35s)… ──────────────────`);
   await p1.waitForFunction(
-    () => document.querySelectorAll('.bubble:not(.is-loading)').length >= 4,
-    { timeout: 35000 }
+    (n) => document.querySelectorAll('.bubble:not(.is-loading)').length >= n,
+    { timeout: 35000 },
+    MESSAGE_COUNT
   );
   await new Promise(r => setTimeout(r, 800));
 
-  await assertMessages(p1, 4, 'First visit — all messages');
+  await assertMessages(p1, MESSAGE_COUNT, 'First visit — all messages');
 
-  const finalCount = await p1.evaluate(() => parseInt(localStorage.getItem('cv_messages_seen'), 10));
-  assert(finalCount === 4, `localStorage count = 4 after all revealed (got ${finalCount})`);
+  const finalCount = await p1.evaluate((key) => parseInt(localStorage.getItem(key), 10), STORAGE_KEY);
+  assert(finalCount === MESSAGE_COUNT, `localStorage count = ${MESSAGE_COUNT} after all revealed (got ${finalCount})`);
 
   const hrefs = await p1.$$eval('.bubble .message a', els => els.map(el => el.getAttribute('href')));
-  assert(hrefs.includes('https://behance.net/chrisvalmonte'), 'Behance link present');
-  assert(hrefs.includes('https://github.com/chrisvalmonte'), 'GitHub link present');
+  assert(hrefs.includes('https://youtu.be/CNY_cEXMnwE'), 'YouTube link present');
 
-  await p1.screenshot({ path: path.join(__dirname, 'screenshots/first-visit.png'), fullPage: true });
+  await assertDesktopFrame(p1);
+  await assertBubblePadding(p1, 'first visit, animated');
 
-  // ── Partial visit: 3 bubbles persisted, rest animate in ─────────────────
+  await p1.screenshot({ path: path.join(__dirname, 'screenshots/first-visit.png') });
+
+  // ── Partial visit: 2 bubbles persisted, rest animate in ─────────────────
   const p2 = await browser.newPage();
-  await p2.setViewport({ width: 1280, height: 800 });
-  await p2.evaluateOnNewDocument(() => localStorage.setItem('cv_messages_seen', '3'));
+  await p2.setViewport(DESKTOP);
+  await p2.evaluateOnNewDocument((key) => localStorage.setItem(key, '2'), STORAGE_KEY);
   await p2.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 600));
 
-  console.log('\n── Partial visit: 3 persisted ─────────────────────────────');
+  console.log('\n── Partial visit: 2 persisted ─────────────────────────────');
   const earlyCount = await p2.$$eval('.bubble', els => els.length);
-  assert(earlyCount >= 3, `At least 3 bubbles immediately present (got ${earlyCount})`);
+  assert(earlyCount >= 2, `At least 2 bubbles immediately present (got ${earlyCount})`);
 
   await p2.waitForFunction(
-    () => document.querySelectorAll('.bubble:not(.is-loading)').length >= 4,
-    { timeout: 35000 }
+    (n) => document.querySelectorAll('.bubble:not(.is-loading)').length >= n,
+    { timeout: 35000 },
+    MESSAGE_COUNT
   );
   await new Promise(r => setTimeout(r, 800));
-  await assertMessages(p2, 4, 'Partial visit — all messages after animation');
-  await p2.screenshot({ path: path.join(__dirname, 'screenshots/partial-visit.png'), fullPage: true });
+  await assertMessages(p2, MESSAGE_COUNT, 'Partial visit — all messages after animation');
+  await p2.screenshot({ path: path.join(__dirname, 'screenshots/partial-visit.png') });
 
-  // ── Full return visit: all 4 persisted, no animation ───────────────────
+  // ── Full return visit: all persisted, no animation ─────────────────────
   const p3 = await browser.newPage();
-  await p3.setViewport({ width: 1280, height: 800 });
-  await p3.evaluateOnNewDocument(() => localStorage.setItem('cv_messages_seen', '4'));
+  await p3.setViewport(DESKTOP);
+  await p3.evaluateOnNewDocument((key, n) => localStorage.setItem(key, String(n)), STORAGE_KEY, MESSAGE_COUNT);
   await p3.goto(url, { waitUntil: 'networkidle0' });
   await new Promise(r => setTimeout(r, 800));
 
   console.log('\n── Full return visit: no loading dots ─────────────────────');
   const loadingOnReturn = await p3.$$eval('.bubble.is-loading', els => els.length);
   assert(loadingOnReturn === 0, 'No loading dots on full return visit');
-  await assertMessages(p3, 4, 'Full return visit — all messages');
-  await p3.screenshot({ path: path.join(__dirname, 'screenshots/return-visit.png'), fullPage: true });
+  await assertMessages(p3, MESSAGE_COUNT, 'Full return visit — all messages');
+  await assertDesktopFrame(p3);
+  await p3.screenshot({ path: path.join(__dirname, 'screenshots/return-visit.png') });
+
+  // ── Short desktop viewport: the frame scales instead of clipping ────────
+  const p4 = await browser.newPage();
+  await p4.setViewport({ width: 1440, height: 700 });
+  await p4.evaluateOnNewDocument((key, n) => localStorage.setItem(key, String(n)), STORAGE_KEY, MESSAGE_COUNT);
+  await p4.goto(url, { waitUntil: 'networkidle0' });
+  await new Promise(r => setTimeout(r, 800));
+
+  console.log('\n── Short desktop viewport (1440×700) ──────────────────────');
+  const shortFrame = await p4.evaluate(readFrame);
+  assert(shortFrame.device.h < 844, `Device scales down to fit (${shortFrame.device.h.toFixed(0)}px tall)`);
+  await assertDesktopFrame(p4);
+  await p4.screenshot({ path: path.join(__dirname, 'screenshots/short-viewport.png') });
+
+  // ── Mobile: no frame, chat stays full-bleed ────────────────────────────
+  const p5 = await browser.newPage();
+  await p5.setViewport(MOBILE);
+  await p5.evaluateOnNewDocument((key, n) => localStorage.setItem(key, String(n)), STORAGE_KEY, MESSAGE_COUNT);
+  await p5.goto(url, { waitUntil: 'networkidle0' });
+  await new Promise(r => setTimeout(r, 800));
+
+  await assertMobileFullBleed(p5);
+  await assertBubblePadding(p5, 'mobile');
+  await assertMessages(p5, MESSAGE_COUNT, 'Mobile — all messages');
+  await p5.screenshot({ path: path.join(__dirname, 'screenshots/mobile.png') });
 
   // ── Summary ─────────────────────────────────────────────────────────────
   console.log(`\n${'─'.repeat(60)}`);
