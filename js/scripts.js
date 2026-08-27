@@ -2,8 +2,32 @@ const STORAGE_KEY = 'cv_messages_seen_v2';
 
 window.onload = function () {
   const fab = document.querySelector('.fab > a');
-  gsap.to(fab, { scale: 1, duration: 0.5, ease: 'power1.out' });
-  Messages.init();
+  // Must stay in sync with the device-frame breakpoint in styles.css.
+  const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+  const showFab = function (delay) {
+    gsap.to(fab, { scale: 1, duration: 0.5, delay: delay || 0, ease: 'power1.out' });
+  };
+
+  // Paint persisted bubbles before anything moves, so on a return visit the
+  // phone rises with the conversation already on its screen.
+  const hasSeenBubbles = Messages.init();
+
+  const entrance = gsap.timeline();
+  if (isDesktop) {
+    entrance.to('.device', { y: 0, duration: 1.2, ease: 'power2.out' });
+  }
+  entrance.call(function () {
+    // The reply button follows the first message. On a return visit that
+    // message is already on screen, so it comes in with the phone instead.
+    if (hasSeenBubbles) {
+      // Nothing is being typed out, so the button has no beat to wait for.
+      showFab();
+      Messages.start();
+    } else {
+      // Let the first message settle before the button joins it.
+      Messages.start(function () { showFab(0.6); });
+    }
+  });
 };
 
 const Messages = (function () {
@@ -11,6 +35,7 @@ const Messages = (function () {
   const _typingSpeed = 45;
   const _loadingText = '<b>•</b><b>•</b><b>•</b>';
   let _messageIndex = 0;
+  let _onFirstMessage = null;
 
   const _messages = [
     'Hey 👋',
@@ -117,6 +142,13 @@ const Messages = (function () {
           if (this.progress() >= 0.65 && elements.bubble.classList.contains('is-loading')) {
             elements.bubble.classList.remove('is-loading');
             gsap.to(elements.message, { opacity: 1, duration: 0.45 });
+
+            if (_onFirstMessage) {
+              const notify = _onFirstMessage;
+              _onFirstMessage = null;
+              notify();
+            }
+
             // Persist this bubble as soon as its text is revealed
             const seen = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
             localStorage.setItem(STORAGE_KEY, seen + 1);
@@ -176,6 +208,8 @@ const Messages = (function () {
     });
   };
 
+  // Paint what the visitor has already seen. Split from `start` so the caller
+  // can land the bubbles before the entrance animation runs.
   const init = function () {
     const seenCount = Math.min(
       parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10),
@@ -184,11 +218,17 @@ const Messages = (function () {
 
     if (seenCount > 0) _renderSeen(seenCount);
 
-    if (seenCount < _messages.length) {
-      _messageIndex = seenCount;
-      _sendMessages();
-    }
+    _messageIndex = seenCount;
+
+    return seenCount > 0;
   };
 
-  return { init };
+  // Begin animating whatever is left to say. `onFirstMessage` fires once the
+  // first bubble's text is actually revealed, not when its loading pill appears.
+  const start = function (onFirstMessage) {
+    _onFirstMessage = onFirstMessage || null;
+    if (_messageIndex < _messages.length) _sendMessages();
+  };
+
+  return { init, start };
 })();
