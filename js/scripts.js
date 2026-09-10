@@ -43,7 +43,7 @@ const Messages = (function () {
   const _messages = [
     'Hey 👋',
     'Check out my work',
-    '<a href="https://behance.net/chrisvalmonte" rel="noopener noreferrer" target="_blank">behance.net/chrisvalmonte</a>',
+    '<a href="https://youtu.be/WtHb13-RMlk" rel="noopener noreferrer" target="_blank">youtu.be/WtHb13-RMlk</a><br><a href="https://behance.net/chrisvalmonte" rel="noopener noreferrer" target="_blank">behance.net/chrisvalmonte</a>',
   ];
 
   const _getFontSize = function () {

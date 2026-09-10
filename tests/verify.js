@@ -44,7 +44,7 @@ function assert(condition, label) {
 const ALL_TEXTS = [
   t => t === 'Hey 👋',
   t => t === 'Check out my work',
-  t => t.includes('behance.net/chrisvalmonte'),
+  t => t.includes('youtu.be/WtHb13-RMlk') && t.includes('behance.net/chrisvalmonte'),
 ];
 const MESSAGE_COUNT = ALL_TEXTS.length;
 
@@ -354,6 +354,7 @@ async function assertMobileFullBleed(page) {
   assert(finalCount === MESSAGE_COUNT, `localStorage count = ${MESSAGE_COUNT} after all revealed (got ${finalCount})`);
 
   const hrefs = await p1.$$eval('.bubble .message a', els => els.map(el => el.getAttribute('href')));
+  assert(hrefs.includes('https://youtu.be/WtHb13-RMlk'), 'YouTube link present');
   assert(hrefs.includes('https://behance.net/chrisvalmonte'), 'Behance link present');
 
   await waitForDeviceAtRest(p1);
